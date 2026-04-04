@@ -1,0 +1,5 @@
+11:11:12 [[34mdebug[39m]: Executing (default): SELECT 1+1 AS result
+11:11:12 [[32minfo[39m]: ✅ MySQL Database connected successfully
+11:11:12 [[32minfo[39m]: 🚀 Server running on http://localhost:5000
+11:11:12 [[32minfo[39m]: 📡 API base: http://localhost:5000/api/v1
+11:11:12 [[32minfo[39m]: 🌍 Environment: development
