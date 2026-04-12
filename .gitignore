@@ -4,11 +4,13 @@ node_modules/
 .pnp.js
 
 # Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*
+!.env.example
+!.env.production.example
+!.env.production.hostinger-vps.example
+!.env.production.managed-db.example
+!.env.production.mikro-living-v2.example
+!.env.production.template
 
 # Next.js
 .next/

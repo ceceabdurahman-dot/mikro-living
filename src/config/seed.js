@@ -3,6 +3,27 @@ const bcrypt = require('bcryptjs')
 const { sequelize } = require('./database')
 const { User, Service, SiteSetting, Project, Testimonial, BlogPost } = require('../models')
 
+const resolveSeedAdminConfig = () => {
+  const isProduction = process.env.NODE_ENV === 'production'
+  const email = String(
+    process.env.ADMIN_EMAIL || (isProduction ? '' : 'admin@mikroliving.local')
+  ).trim()
+  const password = String(
+    process.env.ADMIN_PASSWORD || (isProduction ? '' : 'Admin@Mikro2024!')
+  ).trim()
+  const name = String(process.env.ADMIN_NAME || 'MikroLiving Admin').trim()
+
+  if (!email || !password) {
+    throw new Error('ADMIN_EMAIL dan ADMIN_PASSWORD wajib diisi sebelum menjalankan seed.')
+  }
+
+  if (isProduction && /change_me|replace_with|your-domain|your_|example/i.test(`${email} ${password}`)) {
+    throw new Error('ADMIN_EMAIL atau ADMIN_PASSWORD masih memakai placeholder.')
+  }
+
+  return { email, password, name }
+}
+
 const services = [
   {
     title: 'Interior Design',
@@ -99,16 +120,14 @@ const seed = async () => {
   try {
     console.log('Seeding database...')
     await sequelize.authenticate()
+    const adminConfig = resolveSeedAdminConfig()
 
-    const hashedPassword = await bcrypt.hash(
-      process.env.ADMIN_PASSWORD || 'Admin@Mikro2024!',
-      12
-    )
+    const hashedPassword = await bcrypt.hash(adminConfig.password, 12)
 
     const [admin] = await User.findOrCreate({
-      where: { email: process.env.ADMIN_EMAIL || 'admin@mikroliving.com' },
+      where: { email: adminConfig.email },
       defaults: {
-        name: process.env.ADMIN_NAME || 'MikroLiving Admin',
+        name: adminConfig.name,
         password: hashedPassword,
         role: 'superadmin',
         is_active: true,
@@ -177,8 +196,12 @@ const seed = async () => {
     console.log('Sample blog post seeded')
 
     console.log('Database seeding complete')
-    console.log(`Admin login: ${process.env.ADMIN_EMAIL || 'admin@mikroliving.com'}`)
-    console.log(`Password: ${process.env.ADMIN_PASSWORD || 'Admin@Mikro2024!'}`)
+    console.log(`Admin login: ${adminConfig.email}`)
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Password: [configured via ADMIN_PASSWORD env]')
+    } else {
+      console.log(`Password: ${adminConfig.password}`)
+    }
     process.exit(0)
   } catch (error) {
     console.error('Seeding failed:', error)
