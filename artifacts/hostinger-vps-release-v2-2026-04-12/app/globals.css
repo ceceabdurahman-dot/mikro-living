@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #785600;
+  --primary-container: #986d00;
+  --primary-fixed-dim: #f7bd48;
+  --background: #fbf9f6;
+  --on-surface: #1b1c1a;
+}
+
+.public-theme {
+  --public-headline-font: "Noto Serif", Georgia, serif;
+  --public-primary-color: var(--primary);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--on-surface);
+  font-family: 'Manrope', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: #f7bd48;
+  color: #271900;
+}
+
+.serif-italic {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-style: italic;
+}
+
+.public-theme .font-headline {
+  font-family: var(--public-headline-font) !important;
+}
+
+.public-theme .text-primary,
+.public-theme .hover\:text-primary:hover,
+.public-theme .focus\:text-primary:focus,
+.public-theme .group:hover .group-hover\:text-primary {
+  color: var(--public-primary-color) !important;
+}
+
+.public-theme .border-primary,
+.public-theme .hover\:border-primary:hover,
+.public-theme .group:hover .group-hover\:border-primary {
+  border-color: var(--public-primary-color) !important;
+}
+
+.public-theme .bg-primary,
+.public-theme .hover\:bg-primary:hover {
+  background-color: var(--public-primary-color) !important;
+}
+
+.public-theme .fill-primary {
+  fill: var(--public-primary-color) !important;
+}
+
+.public-theme .stroke-primary {
+  stroke: var(--public-primary-color) !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.article-rich-content [data-lead='true'] {
+  max-width: 38rem;
+  margin-top: 0.5rem;
+  font-size: 1.3rem;
+  line-height: 2.2rem;
+  font-weight: 500;
+  color: #1c1917;
+}
+
+.article-rich-content [data-lead='true']::first-letter {
+  float: left;
+  margin-right: 0.45rem;
+  padding-top: 0.18rem;
+  font-family: var(--public-headline-font, 'Noto Serif', Georgia, serif);
+  font-size: 4.35rem;
+  line-height: 0.86;
+  color: var(--public-primary-color, var(--primary));
+}
+
+@media (min-width: 768px) {
+  .article-rich-content [data-lead='true'] {
+    max-width: 41rem;
+    font-size: 1.52rem;
+    line-height: 2.55rem;
+  }
+
+  .article-rich-content [data-lead='true']::first-letter {
+    margin-right: 0.55rem;
+    font-size: 5rem;
+  }
+}
+
+/* Custom cursor dot */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.1s ease;
+}
+
+/* Grain overlay for texture */
+.grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
