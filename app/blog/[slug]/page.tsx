@@ -26,11 +26,12 @@ const formatPublishedDate = (value?: string | null) => {
 export default async function BlogDetailPage({
   params,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
   try {
+    const { slug } = await params
     const [postResponse, listResponse] = await Promise.all([
-      blogApi.getOne(params.slug),
+      blogApi.getOne(slug),
       blogApi.getAll({ limit: 4 }),
     ])
 

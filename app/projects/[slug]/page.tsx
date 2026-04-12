@@ -11,10 +11,11 @@ const fallbackImage =
 export default async function ProjectDetailPage({
   params,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
   try {
-    const response = await projectsApi.getOne(params.slug)
+    const { slug } = await params
+    const response = await projectsApi.getOne(slug)
     const project = response.data
     const gallery = [
       ...(project.cover_url ? [{ id: 'cover', url: project.cover_url, alt_text: project.title }] : []),

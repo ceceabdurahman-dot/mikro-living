@@ -1,4 +1,6 @@
-﻿/** @type {import(''next'').NextConfig} */
+/** @type {import('next').NextConfig} */
+const enableWorkerThreads = process.env.NEXT_ENABLE_WORKER_THREADS === 'true'
+
 const nextConfig = {
   output: 'standalone',
   poweredByHeader: false,
@@ -15,7 +17,7 @@ const nextConfig = {
     ]
   },
   experimental: {
-    workerThreads: true,
+    ...(enableWorkerThreads ? { workerThreads: true } : {}),
     webpackBuildWorker: false,
   },
   images: {
