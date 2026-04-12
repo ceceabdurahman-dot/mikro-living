@@ -11,6 +11,7 @@ import {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api/v1'
 const PAGE_SIZE = 10
 const SEARCH_DEBOUNCE_MS = 300
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type ManagedUser = {
   id: number
@@ -33,7 +34,7 @@ type PaginatedMeta = {
 type UserFormState = {
   name: string
   email: string
-  role: 'admin' | 'editor'
+  role: 'superadmin' | 'admin' | 'editor'
   password: string
   is_active: boolean
 }
@@ -140,7 +141,8 @@ export default function UserManagementSection({
   currentUserRole: string
 }) {
   const canManageUsers = currentUserRole === 'admin' || currentUserRole === 'superadmin'
-  const roleOptions = currentUserRole === 'superadmin' ? ['admin', 'editor'] : ['editor']
+  const roleOptions: UserFormState['role'][] =
+    currentUserRole === 'superadmin' ? ['admin', 'editor'] : ['editor']
 
   const [users, setUsers] = useState<ManagedUser[]>([])
   const [meta, setMeta] = useState<PaginatedMeta>({ total: 0, page: 1, limit: PAGE_SIZE, totalPages: 1 })
@@ -236,7 +238,7 @@ export default function UserManagementSection({
     setUserForm({
       name: user.name,
       email: user.email,
-      role: user.role === 'admin' ? 'admin' : 'editor',
+      role: user.role,
       password: '',
       is_active: user.is_active,
     })
@@ -247,9 +249,11 @@ export default function UserManagementSection({
   }
 
   const buildUserFormData = () => {
+    const normalizedName = userForm.name.trim()
+    const normalizedEmail = userForm.email.trim().toLowerCase()
     const formData = new FormData()
-    formData.append('name', userForm.name)
-    formData.append('email', userForm.email)
+    formData.append('name', normalizedName)
+    formData.append('email', normalizedEmail)
     formData.append('role', userForm.role)
     formData.append('is_active', userForm.is_active ? 'true' : 'false')
 
@@ -271,8 +275,15 @@ export default function UserManagementSection({
       setError('')
       setFlash('')
 
-      if (!userForm.name || !userForm.email) {
+      const normalizedName = userForm.name.trim()
+      const normalizedEmail = userForm.email.trim().toLowerCase()
+
+      if (!normalizedName || !normalizedEmail) {
         throw new Error('Nama dan email wajib diisi.')
+      }
+
+      if (!EMAIL_PATTERN.test(normalizedEmail)) {
+        throw new Error('Format email tidak valid.')
       }
 
       if (!editingUser && userForm.password.length < 8) {
@@ -423,6 +434,8 @@ export default function UserManagementSection({
   }, [selectedUserIds])
 
   const avatarPreview = avatarPreviewUrl || editingUser?.avatar_url || ''
+  const formRoleOptions: UserFormState['role'][] = editingUser?.role === 'superadmin' ? ['superadmin'] : roleOptions
+  const isRoleLocked = editingUser?.role === 'superadmin'
 
   if (!canManageUsers) {
     return (
@@ -672,17 +685,23 @@ export default function UserManagementSection({
             <select
               className={inputClassName}
               value={userForm.role}
+              disabled={isRoleLocked}
               onChange={(event) =>
-                setUserForm((current) => ({ ...current, role: event.target.value as 'admin' | 'editor' }))
+                setUserForm((current) => ({ ...current, role: event.target.value as UserFormState['role'] }))
               }
             >
-              {roleOptions.map((role) => (
+              {formRoleOptions.map((role) => (
                 <option key={role} value={role}>
                   {role}
                 </option>
               ))}
             </select>
           </label>
+          {isRoleLocked ? (
+            <p className="text-xs text-stone-500 md:col-span-2">
+              Role superadmin dikunci agar tidak berubah tidak sengaja dari form ini.
+            </p>
+          ) : null}
           {!editingUser ? (
             <label className="block space-y-1.5">
               <span className="text-[13px] font-semibold text-stone-700">Password awal</span>
@@ -766,6 +785,7 @@ export default function UserManagementSection({
           <ul className="mt-3 space-y-2 text-xs leading-6 text-stone-500">
             <li>Admin dapat menambah, menghapus, menonaktifkan, dan mengganti password user editor.</li>
             <li>Superadmin tetap dapat mengelola admin dan editor.</li>
+            <li>Role superadmin tidak dapat diubah dari form kelola user untuk mencegah self-demotion.</li>
             <li>Reset password email sungguhan siap dipakai begitu konfigurasi SMTP produksi diisi valid.</li>
           </ul>
         </div>

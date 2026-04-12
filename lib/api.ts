@@ -1,14 +1,45 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api/v1'
+const DEFAULT_SERVER_TIMEOUT_MS = Number(process.env.API_REQUEST_TIMEOUT_MS || 10000)
 
 interface FetchOptions extends RequestInit {
   token?: string
+  timeoutMs?: number
   next?: {
     revalidate?: number
   }
 }
 
+function withTimeout(signal: AbortSignal | null | undefined, timeoutMs: number) {
+  if (!timeoutMs || timeoutMs <= 0) {
+    return { signal, cleanup: () => {} }
+  }
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => {
+    controller.abort(new Error(`Request timed out after ${timeoutMs}ms`))
+  }, timeoutMs)
+
+  const abortFromSource = () => controller.abort(signal?.reason)
+
+  if (signal) {
+    if (signal.aborted) {
+      controller.abort(signal.reason)
+    } else {
+      signal.addEventListener('abort', abortFromSource, { once: true })
+    }
+  }
+
+  return {
+    signal: controller.signal,
+    cleanup: () => {
+      clearTimeout(timeoutId)
+      signal?.removeEventListener('abort', abortFromSource)
+    },
+  }
+}
+
 async function fetchAPI<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
-  const { token, ...rest } = options
+  const { token, timeoutMs, ...rest } = options
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -26,11 +57,26 @@ async function fetchAPI<T>(endpoint: string, options: FetchOptions = {}): Promis
     requestOptions.cache = 'no-store'
   }
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, requestOptions)
+  const effectiveTimeoutMs =
+    timeoutMs ?? (typeof window === 'undefined' ? DEFAULT_SERVER_TIMEOUT_MS : 0)
+  const { signal, cleanup } = withTimeout(requestOptions.signal, effectiveTimeoutMs)
+  if (signal) {
+    requestOptions.signal = signal
+  }
 
-  const data = await response.json()
-  if (!response.ok) throw new Error(data.message || 'API Error')
-  return data
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}`, requestOptions)
+    const data = await response.json()
+    if (!response.ok) throw new Error(data.message || 'API Error')
+    return data
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`API request timed out for ${endpoint}`)
+    }
+    throw error
+  } finally {
+    cleanup()
+  }
 }
 
 export const projectsApi = {

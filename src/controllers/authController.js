@@ -10,6 +10,16 @@ const { deleteFromCloudinary } = require('../config/cloudinary')
 const { setAuthCookies, clearAuthCookies, REFRESH_COOKIE_NAME } = require('../utils/authCookies')
 
 const normalizeEmail = (email = '') => String(email).trim().toLowerCase()
+const normalizeUserName = (name = '') => String(name).trim()
+const USER_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const isValidManagedUserEmail = (email) => USER_EMAIL_PATTERN.test(normalizeEmail(email))
+
+const parseBooleanInput = (value) => {
+  if (value === true || value === 'true') return true
+  if (value === false || value === 'false') return false
+  return null
+}
 
 const generateAccessToken = (user) =>
   jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, {
@@ -383,8 +393,10 @@ exports.listUsers = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   const { name, email, password, role } = req.body
+  const normalizedName = normalizeUserName(name)
+  const normalizedEmail = normalizeEmail(email)
 
-  if (!name || !email || !password) {
+  if (!normalizedName || !normalizedEmail || !password) {
     return api.badRequest(res, 'Nama, email, dan password wajib diisi')
   }
 
@@ -392,7 +404,10 @@ exports.createUser = async (req, res) => {
     return api.badRequest(res, 'Password minimal 8 karakter')
   }
 
-  const normalizedEmail = normalizeEmail(email)
+  if (!isValidManagedUserEmail(normalizedEmail)) {
+    return api.badRequest(res, 'Format email tidak valid')
+  }
+
   const normalizedRole = String(role || 'editor').trim()
   const allowedRoles = allowedRolesForCreator(req.user)
 
@@ -407,7 +422,7 @@ exports.createUser = async (req, res) => {
 
   const hashed = await bcrypt.hash(password, 12)
   const user = await User.create({
-    name: String(name).trim(),
+    name: normalizedName,
     email: normalizedEmail,
     password: hashed,
     role: normalizedRole,
@@ -428,10 +443,23 @@ exports.updateUser = async (req, res) => {
 
   const updates = {}
 
-  if (req.body.name !== undefined) updates.name = String(req.body.name).trim()
+  if (req.body.name !== undefined) {
+    const normalizedName = normalizeUserName(req.body.name)
+
+    if (!normalizedName) {
+      return api.badRequest(res, 'Nama wajib diisi')
+    }
+
+    updates.name = normalizedName
+  }
 
   if (req.body.email !== undefined) {
     const normalizedEmail = normalizeEmail(req.body.email)
+
+    if (!normalizedEmail || !isValidManagedUserEmail(normalizedEmail)) {
+      return api.badRequest(res, 'Format email tidak valid')
+    }
+
     const exists = await User.findOne({
       where: {
         email: normalizedEmail,
@@ -448,15 +476,27 @@ exports.updateUser = async (req, res) => {
 
   if (req.body.role !== undefined) {
     const nextRole = String(req.body.role).trim()
-    const allowedRoles = allowedRolesForCreator(req.user)
-    if (!allowedRoles.includes(nextRole)) {
-      return api.forbidden(res, 'Anda tidak memiliki izin mengubah role ke nilai tersebut.')
+
+    if (user.role === 'superadmin') {
+      if (nextRole !== user.role) {
+        return api.badRequest(res, 'Role superadmin tidak dapat diubah melalui form ini.')
+      }
+    } else if (nextRole !== user.role) {
+      const allowedRoles = allowedRolesForCreator(req.user)
+      if (!allowedRoles.includes(nextRole)) {
+        return api.forbidden(res, 'Anda tidak memiliki izin mengubah role ke nilai tersebut.')
+      }
+      updates.role = nextRole
     }
-    updates.role = nextRole
   }
 
   if (req.body.is_active !== undefined) {
-    const nextActive = req.body.is_active === true || req.body.is_active === 'true'
+    const nextActive = parseBooleanInput(req.body.is_active)
+
+    if (nextActive === null) {
+      return api.badRequest(res, 'Status user harus bernilai true atau false.')
+    }
+
     if (req.user.id === user.id && !nextActive) {
       return api.badRequest(res, 'Anda tidak dapat menonaktifkan akun sendiri.')
     }
@@ -475,10 +515,14 @@ exports.updateUser = async (req, res) => {
 
 exports.bulkUpdateUserStatus = async (req, res) => {
   const ids = Array.isArray(req.body?.ids) ? req.body.ids.map((id) => Number(id)).filter(Boolean) : []
-  const nextActive = req.body?.is_active === true || req.body?.is_active === 'true'
+  const nextActive = parseBooleanInput(req.body?.is_active)
 
   if (!ids.length) {
     return api.badRequest(res, 'Pilih minimal satu user untuk diproses.')
+  }
+
+  if (nextActive === null) {
+    return api.badRequest(res, 'Status user harus bernilai true atau false.')
   }
 
   const users = await User.findAll({ where: { id: ids } })

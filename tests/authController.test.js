@@ -274,3 +274,221 @@ test('admin reset password endpoint rejects self password changes', async () => 
     restore()
   }
 })
+
+test('create user rejects whitespace-only required fields', async () => {
+  let badRequestMessage = null
+  let findOneCalled = false
+
+  const { controller, restore } = loadControllerWithMocks({
+    models: {
+      User: {
+        findOne: async () => {
+          findOneCalled = true
+          return null
+        },
+      },
+    },
+    apiResponse: {
+      ...noopApiResponse,
+      badRequest: (res, message) => {
+        badRequestMessage = message
+        return { ok: false, message }
+      },
+    },
+    logger: noopLogger,
+    email: { sendMail: async () => {} },
+    cloudinary: { deleteFromCloudinary: async () => {} },
+    authCookies: {
+      REFRESH_COOKIE_NAME: 'ml_refresh_token',
+      clearAuthCookies: () => {},
+      setAuthCookies: () => {},
+    },
+  })
+
+  try {
+    const req = {
+      user: { id: 2, role: 'admin' },
+      body: {
+        name: '   ',
+        email: '   ',
+        password: 'password-123',
+        role: 'editor',
+      },
+    }
+    const res = {}
+
+    await controller.createUser(req, res)
+
+    assert.equal(badRequestMessage, 'Nama, email, dan password wajib diisi')
+    assert.equal(findOneCalled, false)
+  } finally {
+    restore()
+  }
+})
+
+test('update user rejects self demotion for superadmin accounts', async () => {
+  let badRequestMessage = null
+  let updateCalled = false
+
+  const user = {
+    id: 11,
+    role: 'superadmin',
+    update: async () => {
+      updateCalled = true
+    },
+    reload: async () => {},
+  }
+
+  const { controller, restore } = loadControllerWithMocks({
+    models: {
+      User: {
+        findByPk: async () => user,
+        findOne: async () => null,
+      },
+    },
+    apiResponse: {
+      ...noopApiResponse,
+      badRequest: (res, message) => {
+        badRequestMessage = message
+        return { ok: false, message }
+      },
+    },
+    logger: noopLogger,
+    email: { sendMail: async () => {} },
+    cloudinary: { deleteFromCloudinary: async () => {} },
+    authCookies: {
+      REFRESH_COOKIE_NAME: 'ml_refresh_token',
+      clearAuthCookies: () => {},
+      setAuthCookies: () => {},
+    },
+  })
+
+  try {
+    const req = {
+      params: { id: '11' },
+      user: { id: 11, role: 'superadmin' },
+      body: {
+        role: 'editor',
+      },
+    }
+    const res = {}
+
+    await controller.updateUser(req, res)
+
+    assert.equal(badRequestMessage, 'Role superadmin tidak dapat diubah melalui form ini.')
+    assert.equal(updateCalled, false)
+  } finally {
+    restore()
+  }
+})
+
+test('update user rejects invalid email format', async () => {
+  let badRequestMessage = null
+  let findOneCalled = false
+
+  const user = {
+    id: 12,
+    role: 'editor',
+    update: async () => {
+      throw new Error('update should not run for invalid email')
+    },
+    reload: async () => {},
+  }
+
+  const { controller, restore } = loadControllerWithMocks({
+    models: {
+      User: {
+        findByPk: async () => user,
+        findOne: async () => {
+          findOneCalled = true
+          return null
+        },
+      },
+    },
+    apiResponse: {
+      ...noopApiResponse,
+      badRequest: (res, message) => {
+        badRequestMessage = message
+        return { ok: false, message }
+      },
+    },
+    logger: noopLogger,
+    email: { sendMail: async () => {} },
+    cloudinary: { deleteFromCloudinary: async () => {} },
+    authCookies: {
+      REFRESH_COOKIE_NAME: 'ml_refresh_token',
+      clearAuthCookies: () => {},
+      setAuthCookies: () => {},
+    },
+  })
+
+  try {
+    const req = {
+      params: { id: '12' },
+      user: { id: 1, role: 'admin' },
+      body: {
+        email: 'not-an-email',
+      },
+    }
+    const res = {}
+
+    await controller.updateUser(req, res)
+
+    assert.equal(badRequestMessage, 'Format email tidak valid')
+    assert.equal(findOneCalled, false)
+  } finally {
+    restore()
+  }
+})
+
+test('bulk update user status rejects malformed boolean payloads', async () => {
+  let badRequestMessage = null
+  let findAllCalled = false
+
+  const { controller, restore } = loadControllerWithMocks({
+    models: {
+      User: {
+        findAll: async () => {
+          findAllCalled = true
+          return []
+        },
+        update: async () => {
+          throw new Error('bulk update should not run for invalid payload')
+        },
+      },
+    },
+    apiResponse: {
+      ...noopApiResponse,
+      badRequest: (res, message) => {
+        badRequestMessage = message
+        return { ok: false, message }
+      },
+    },
+    logger: noopLogger,
+    email: { sendMail: async () => {} },
+    cloudinary: { deleteFromCloudinary: async () => {} },
+    authCookies: {
+      REFRESH_COOKIE_NAME: 'ml_refresh_token',
+      clearAuthCookies: () => {},
+      setAuthCookies: () => {},
+    },
+  })
+
+  try {
+    const req = {
+      body: {
+        ids: [5, 6],
+        is_active: 'yes',
+      },
+      user: { id: 1, role: 'admin' },
+    }
+    const res = {}
+
+    await controller.bulkUpdateUserStatus(req, res)
+
+    assert.equal(badRequestMessage, 'Status user harus bernilai true atau false.')
+    assert.equal(findAllCalled, false)
+  } finally {
+    restore()
+  }
+})
