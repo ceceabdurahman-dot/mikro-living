@@ -1,0 +1,78 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to deploy
+        required: true
+        default: main
+
+concurrency:
+  group: hostinger-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_BRANCH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref_name }}
+      DEPLOY_PATH: ${{ secrets.HOSTINGER_DEPLOY_PATH }}
+      SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+      SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
+      SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+      COMPOSE_FILES: ${{ vars.HOSTINGER_COMPOSE_FILES || '-f docker-compose.prod.yml' }}
+      ENV_FILE: ${{ vars.HOSTINGER_ENV_FILE || '.env.production' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deploy settings
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_PATH"
+          test -n "$SSH_HOST"
+          test -n "$SSH_PORT"
+          test -n "$SSH_USER"
+
+      - name: Validate repository build context
+        run: |
+          set -euo pipefail
+          test -f package.json
+          test -f next.config.js
+          test -d src
+          test -d scripts
+          if [ ! -d app ] && [ ! -d pages ]; then
+            echo "Missing Next.js source directory: expected app/ or pages/" >&2
+            exit 1
+          fi
+          if [ ! -f tailwind.config.ts ] && [ ! -f tailwind.config.js ]; then
+            echo "Missing Tailwind config: expected tailwind.config.ts or tailwind.config.js" >&2
+            exit 1
+          fi
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          port: ${{ env.SSH_PORT }}
+          script_stop: true
+          envs: DEPLOY_BRANCH,DEPLOY_PATH,COMPOSE_FILES,ENV_FILE,GITHUB_SHA
+          script: |
+            set -euo pipefail
+            cd "$DEPLOY_PATH"
+
+            git fetch origin "$DEPLOY_BRANCH"
+            git checkout "$DEPLOY_BRANCH"
+            git pull --ff-only origin "$DEPLOY_BRANCH"
+
+            docker compose $COMPOSE_FILES --env-file "$ENV_FILE" build
+            docker compose $COMPOSE_FILES --env-file "$ENV_FILE" up -d
+
+            docker image prune -f
+
+            echo "Deployed commit $GITHUB_SHA to $DEPLOY_BRANCH"

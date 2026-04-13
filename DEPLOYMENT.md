@@ -192,6 +192,56 @@ docker compose -f docker-compose.prod.yml -f docker-compose.prod.managed-db.yml 
 docker compose -f docker-compose.prod.yml -f docker-compose.prod.managed-db.yml --env-file .env.production up -d api web
 ```
 
+## 9. GitHub Actions -> Hostinger VPS
+
+This repo now includes an SSH-based production deploy workflow at [.github/workflows/deploy-hostinger.yml](D:\Cece Abdurahman\Bisnis\Interior\mikro-living\mikro-living\.github\workflows\deploy-hostinger.yml).
+
+Trigger:
+
+- Automatic on push to `main`
+- Manual from the Actions tab with `workflow_dispatch`
+
+Required GitHub repository secrets:
+
+- `HOSTINGER_SSH_HOST`: VPS hostname or IP
+- `HOSTINGER_SSH_PORT`: usually `22`
+- `HOSTINGER_SSH_USER`: SSH user on the VPS
+- `HOSTINGER_SSH_PRIVATE_KEY`: private key matching the public key installed on the VPS
+- `HOSTINGER_DEPLOY_PATH`: absolute path to the cloned repo on the server
+
+Optional GitHub repository variables:
+
+- `HOSTINGER_COMPOSE_FILES`: defaults to `-f docker-compose.prod.yml`
+- `HOSTINGER_ENV_FILE`: defaults to `.env.production`
+
+Example values:
+
+```text
+HOSTINGER_COMPOSE_FILES=-f docker-compose.prod.yml -f docker-compose.prod.managed-db.yml
+HOSTINGER_ENV_FILE=.env.production
+```
+
+Server expectations:
+
+- The repo is already cloned on the VPS at `HOSTINGER_DEPLOY_PATH`
+- Docker and Docker Compose are installed on the VPS
+- The production env file already exists on the server
+- If `AUTO_RUN_MIGRATIONS=true`, migrations run when the `api` container starts
+- The checked-out branch includes the actual application source directories such as `src/`, `scripts/`, and `app/` or `pages/`
+
+The workflow runs these steps on the server:
+
+```bash
+git fetch origin <branch>
+git checkout <branch>
+git pull --ff-only origin <branch>
+docker compose ... --env-file .env.production build
+docker compose ... --env-file .env.production up -d
+docker image prune -f
+```
+
+Before opening the SSH session, the workflow also validates that the repository contains the expected frontend and backend source tree. This prevents a server-side deploy attempt when the branch only contains infra/docs files.
+
 ## Notes
 
 - Frontend uses Next.js `standalone` output for smaller production runtime.

@@ -7,8 +7,11 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-COPY scripts ./scripts
-COPY src ./src
+COPY . .
+
+# Fail early with a clear error if the backend source tree is incomplete.
+RUN test -d scripts
+RUN test -d src
 
 RUN mkdir -p uploads
 

@@ -12,17 +12,11 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 COPY package*.json ./
 RUN npm ci
 
-COPY app ./app
-COPY components ./components
-COPY lib ./lib
-COPY middleware.ts ./middleware.ts
-COPY next-env.d.ts ./next-env.d.ts
-COPY next.config.js ./next.config.js
-COPY postcss.config.js ./postcss.config.js
-COPY tailwind.config.js ./tailwind.config.js
-COPY tsconfig.json ./tsconfig.json
-COPY global.d.ts ./global.d.ts
-COPY public ./public
+COPY . .
+
+# Fail early with a clear error if the frontend source tree is incomplete.
+RUN test -d app -o -d pages
+RUN test -f tailwind.config.ts -o -f tailwind.config.js
 
 RUN npm run build:web
 
