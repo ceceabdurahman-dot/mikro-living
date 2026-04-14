@@ -28,6 +28,7 @@ export function ContactIntakeForm() {
       projectType: String(formData.get('projectType') || '').trim(),
       timeline: String(formData.get('timeline') || '').trim(),
       brief: String(formData.get('brief') || '').trim(),
+      company: String(formData.get('company') || '').trim(),
     }
 
     startTransition(async () => {
@@ -70,6 +71,15 @@ export function ContactIntakeForm() {
 
   return (
     <form className="px-6 py-7 sm:px-8 sm:py-9" onSubmit={handleSubmit}>
+      <input
+        aria-hidden="true"
+        autoComplete="off"
+        className="hidden"
+        name="company"
+        tabIndex={-1}
+        type="text"
+      />
+
       <div className="grid gap-5 md:grid-cols-2">
         <label className="grid gap-2 text-sm font-medium text-on-surface">
           Name

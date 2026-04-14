@@ -10,7 +10,6 @@ export async function GET() {
     '/projects',
     '/blog',
     '/contact',
-    '/login',
     ...projects.map((project) => `/projects/${project.slug}`),
     ...posts.map((post) => `/blog/${post.slug}`),
   ]

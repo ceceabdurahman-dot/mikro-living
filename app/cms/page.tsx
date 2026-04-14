@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { LogoutButton } from '@/components/site/logout-button'
 import { SiteShell } from '@/components/site/site-shell'
+import { getCurrentCmsUserFromCookies } from '@/lib/auth'
 
 export const metadata: Metadata = {
   title: 'CMS | MikroLiving',
@@ -11,15 +13,15 @@ export const metadata: Metadata = {
 const workspaceSignals = [
   {
     label: 'Access',
-    value: 'This route is still protected and keeps the original entry point intact.',
+    value: 'This route is protected by a server-validated session check before the CMS opens.',
   },
   {
     label: 'Current state',
-    value: 'UI is ready while the original CMS modules and API source are still being restored.',
+    value: 'Authentication is live while project, journal, and lead modules continue reconnecting.',
   },
   {
     label: 'Next handoff',
-    value: 'Auth, content modules, and publishing actions can reconnect here without a new layout pass.',
+    value: 'Publishing actions, content CRUD, and admin workflows can plug into this shell without a redesign.',
   },
 ]
 
@@ -45,7 +47,9 @@ const restoreChecklist = [
   'Validate protected navigation, redirects, and API contracts',
 ]
 
-export default function CmsPage() {
+export default async function CmsPage() {
+  const currentUser = await getCurrentCmsUserFromCookies()
+
   return (
     <SiteShell>
       <main id="main-content">
@@ -97,26 +101,28 @@ export default function CmsPage() {
                 <div className="mt-6 space-y-5">
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/60">
-                      Route
+                      Signed in
                     </p>
-                    <p className="mt-2 text-2xl font-headline italic text-white">Protected and stable</p>
-                  </div>
-
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/60">
-                      Content modules
-                    </p>
-                    <p className="mt-2 text-sm leading-7 text-stone-300">
-                      Waiting for the original admin source and publishing actions to return.
+                    <p className="mt-2 text-2xl font-headline italic text-white">
+                      {currentUser?.name || 'Protected and stable'}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/60">
-                      Handoff
+                      Role
                     </p>
                     <p className="mt-2 text-sm leading-7 text-stone-300">
-                      Ready to accept auth, CRUD modules, and route-aware redirects without another visual rewrite.
+                      {currentUser?.role || 'Studio admin'}{currentUser?.email ? ` · ${currentUser.email}` : ''}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/60">
+                      Session
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-stone-300">
+                      Backend-authenticated and ready to carry route-aware redirects, module guards, and admin actions.
                     </p>
                   </div>
                 </div>
@@ -128,16 +134,14 @@ export default function CmsPage() {
                     Admin note
                   </p>
                   <p className="mt-3 text-sm leading-7 text-on-surface-variant">
-                    Middleware, route structure, and visual framing are in place. The missing piece is the original CMS logic, not the screen itself.
+                    Authentication, route guards, and secure session cookies are now in place. The remaining work is module depth, not access flow.
                   </p>
                 </div>
 
-                <Link
-                  href="/login?redirect=%2Fcms"
+                <LogoutButton
                   className="inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-3 text-sm font-semibold uppercase tracking-[0.22em] text-white transition hover:border-white/30 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                >
-                  Revisit access flow
-                </Link>
+                  label="Sign out"
+                />
               </div>
             </div>
           </div>
@@ -186,7 +190,7 @@ export default function CmsPage() {
                       Current behavior
                     </p>
                     <p className="mt-3 text-sm leading-7 text-on-surface-variant">
-                      This route is currently a polished operational placeholder. It preserves the guardrail and prepares the shape of the final workspace.
+                      This route now carries a real protected session and prepares the operational shape of the final workspace.
                     </p>
                   </div>
                 </div>

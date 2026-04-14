@@ -1,25 +1,31 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { LoginForm } from '@/components/site/login-form'
+import { normalizeRedirectTarget } from '@/lib/auth'
+
 export const metadata: Metadata = {
   title: 'Login | MikroLiving',
-  description: 'CMS access page for the MikroLiving studio workspace.',
+  description: 'Secure CMS access for the MikroLiving studio workspace.',
 }
 
 type LoginPageProps = {
   searchParams?: {
-    redirect?: string
+    redirect?: string | string[]
   }
 }
 
 const accessNotes = [
-  'The redirect contract remains preserved, so CMS routing can reconnect cleanly.',
-  'This page now reads like a deliberate studio access surface rather than a temporary stop.',
-  'Authentication is still paused until the original backend handoff is restored.',
+  'Protected redirects are preserved, so the workspace handoff stays clean after sign-in.',
+  'Session cookies are now HTTP-only and validated against the backend before CMS access opens.',
+  'The interface is ready for daily admin use without changing the visual language of the site.',
 ]
 
 export default function LoginPage({ searchParams }: LoginPageProps) {
-  const redirectTarget = searchParams?.redirect || '/cms'
+  const redirectValue = Array.isArray(searchParams?.redirect)
+    ? searchParams?.redirect[0]
+    : searchParams?.redirect
+  const redirectTarget = normalizeRedirectTarget(redirectValue)
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden bg-stone-950 px-6 py-8 text-white md:px-8 md:py-10">
@@ -43,9 +49,8 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
               Studio access with a calmer, more precise arrival.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-8 text-stone-300">
-              The page now carries the same tone as the rest of the site: darker, cleaner, and more
-              intentional. It is ready for authentication to reconnect without redesigning the
-              visual entry point.
+              The CMS entry now does real authentication work while keeping the same darker, more
+              deliberate visual tone as the rest of the site.
             </p>
           </div>
 
@@ -75,11 +80,11 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                 Access note
               </p>
               <h2 className="mt-4 max-w-sm text-balance font-headline text-3xl leading-tight text-on-surface sm:text-[2.1rem]">
-                The route is intact. The credentials layer is the only piece still missing.
+                The route and credential flow are now wired back together.
               </h2>
               <p className="mt-4 max-w-sm text-sm leading-7 text-on-surface-variant">
-                We are preserving the real redirect target and entry flow, so once auth is restored
-                the studio team can step back in without a new UX pass.
+                Redirect handling stays intact, session cookies remain protected, and the CMS can
+                reconnect without a separate UX pass.
               </p>
 
               <div className="mt-8 rounded-[1.5rem] bg-white p-5 shadow-lg shadow-stone-900/5">
@@ -114,55 +119,12 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                     Status
                   </p>
                   <p className="mt-2 text-xs font-medium uppercase tracking-[0.28em] text-stone-200">
-                    Authentication paused
+                    Authentication live
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-5 md:grid-cols-2">
-                <label className="grid gap-2 text-sm font-medium text-on-surface">
-                  Email
-                  <input
-                    type="email"
-                    placeholder="admin@mikroliving.com"
-                    className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-                  />
-                </label>
-
-                <label className="grid gap-2 text-sm font-medium text-on-surface">
-                  Password
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-                  />
-                </label>
-              </div>
-
-              <label className="mt-5 grid gap-2 text-sm font-medium text-on-surface">
-                Workspace note
-                <textarea
-                  rows={4}
-                  placeholder="Optional context for the final handoff, such as role, environment, or redirect expectations."
-                  className="rounded-[1.5rem] border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-                />
-              </label>
-
-              <div className="mt-6 rounded-[1.5rem] bg-stone-950 p-5 text-white">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                  <p className="max-w-xl text-sm leading-7 text-stone-300">
-                    Sign-in remains non-submitting for now, but the screen is already ready for the
-                    final authentication layer.
-                  </p>
-                  <button
-                    type="button"
-                    disabled
-                    className="inline-flex w-full items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-on-primary opacity-60 sm:w-auto"
-                  >
-                    Authentication paused
-                  </button>
-                </div>
-              </div>
+              <LoginForm redirectTarget={redirectTarget} />
             </div>
           </div>
         </div>
