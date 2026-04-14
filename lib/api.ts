@@ -32,6 +32,7 @@ type ConsultationRequestResult = {
 }
 
 const CONTENT_REVALIDATE_SECONDS = 300
+const API_REQUEST_TIMEOUT_MS = 5000
 const DEFAULT_PROJECT_IMAGE = fallbackProjects[0]?.image ?? ''
 const DEFAULT_POST_IMAGE = fallbackPosts[0]?.image ?? ''
 
@@ -57,15 +58,31 @@ async function fetchApiJson(path: string, init?: ApiFetchOptions) {
   }
 
   const method = (init?.method || 'GET').toUpperCase()
-  const response = await fetch(`${baseUrl}${path}`, {
-    ...init,
-    headers: {
-      Accept: 'application/json',
-      ...(init?.headers ?? {}),
-    },
-    cache: method === 'GET' ? init?.cache : 'no-store',
-    next: method === 'GET' ? { revalidate: CONTENT_REVALIDATE_SECONDS, ...init?.next } : undefined,
-  })
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), API_REQUEST_TIMEOUT_MS)
+
+  let response: Response
+
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
+      ...init,
+      headers: {
+        Accept: 'application/json',
+        ...(init?.headers ?? {}),
+      },
+      cache: method === 'GET' ? init?.cache : 'no-store',
+      next: method === 'GET' ? { revalidate: CONTENT_REVALIDATE_SECONDS, ...init?.next } : undefined,
+      signal: controller.signal,
+    })
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Request to ${path} timed out after ${API_REQUEST_TIMEOUT_MS}ms.`)
+    }
+
+    throw error
+  } finally {
+    clearTimeout(timeoutId)
+  }
 
   let payload: unknown = null
 
@@ -500,21 +517,31 @@ export async function createConsultationRequest(input: ConsultationRequestInput)
   }
 
   try {
-    const response = await fetch(`${baseUrl}/consultations`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-      body: JSON.stringify({
-        name: input.name,
-        email: input.email,
-        project_type: input.projectType,
-        timeline: input.timeline,
-        message: input.brief,
-      }),
-    })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), API_REQUEST_TIMEOUT_MS)
+
+    let response: Response
+
+    try {
+      response = await fetch(`${baseUrl}/consultations`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+        signal: controller.signal,
+        body: JSON.stringify({
+          name: input.name,
+          email: input.email,
+          project_type: input.projectType,
+          timeline: input.timeline,
+          message: input.brief,
+        }),
+      })
+    } finally {
+      clearTimeout(timeoutId)
+    }
 
     let payload: unknown = null
 
