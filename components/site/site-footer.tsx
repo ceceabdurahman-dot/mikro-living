@@ -100,12 +100,6 @@ export function SiteFooter() {
                 >
                   Consultation
                 </Link>
-                <Link
-                  href="/login"
-                  className="transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-                >
-                  CMS Login
-                </Link>
               </div>
             </div>
 

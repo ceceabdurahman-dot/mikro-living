@@ -32,12 +32,6 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-4 lg:flex">
           <Link
-            href="/login"
-            className="text-[11px] font-bold uppercase tracking-[0.24em] text-on-surface-variant transition-colors hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-          >
-            CMS
-          </Link>
-          <Link
             href="/contact"
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary transition-[background-color,transform] duration-200 hover:bg-primary-container motion-safe:hover:-translate-y-0.5 motion-reduce:transform-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
           >
@@ -72,18 +66,12 @@ export function SiteHeader() {
               ))}
             </div>
 
-            <div className="mt-5 flex gap-3">
+            <div className="mt-5">
               <Link
                 href="/contact"
-                className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
               >
                 Consultation
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center rounded-full border border-outline-variant/40 px-4 py-3 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-low focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-              >
-                CMS
               </Link>
             </div>
           </div>
