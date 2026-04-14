@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import type { ReactNode } from 'react'
 
 import type { Metadata } from 'next'
@@ -24,36 +23,25 @@ export const metadata: Metadata = {
     title: siteMeta.title,
     description: 'Elegant & functional interior design studio in Jakarta and Bandung.',
   },
-=======
-export const metadata = {
-  title: 'MikroLiving',
-  description: 'MikroLiving CMS - Node.js + Express + MySQL Backend',
->>>>>>> e72e8e145eed2e16f23b376e2c31383fdaaef41b
 }
 
 export default function RootLayout({
   children,
-<<<<<<< HEAD
 }: Readonly<{
   children: ReactNode
 }>) {
   return (
     <html lang="id" className="scroll-smooth">
       <body className="bg-background font-body text-on-surface antialiased">
+        <a
+          href="#main-content"
+          className="absolute left-4 top-4 z-[100] -translate-y-20 rounded-full bg-primary px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-on-primary transition-transform focus:translate-y-0 focus-visible:translate-y-0"
+        >
+          Skip to content
+        </a>
         <div className="grain" aria-hidden="true" />
         {children}
       </body>
     </html>
   )
 }
-=======
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  )
-}
->>>>>>> e72e8e145eed2e16f23b376e2c31383fdaaef41b
