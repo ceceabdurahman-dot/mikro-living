@@ -13,9 +13,9 @@ html {
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(247, 189, 72, 0.12), transparent 32%),
-    radial-gradient(circle at bottom right, rgba(123, 88, 0, 0.08), transparent 28%),
-    #fbf9f6;
+    radial-gradient(circle at top right, rgba(247, 189, 72, 0.16), transparent 24%),
+    radial-gradient(circle at 16% 28%, rgba(255, 255, 255, 0.72), transparent 18%),
+    linear-gradient(180deg, #f6f1e9 0%, #f3ede3 44%, #faf8f4 100%);
   color: #1b1c1a;
 }
 
@@ -56,6 +56,48 @@ textarea {
   box-shadow: 0 30px 70px rgba(27, 28, 26, 0.18);
 }
 
+.editorial-frame {
+  position: relative;
+  border-radius: 32px;
+  box-shadow: 0 32px 70px rgba(27, 28, 26, 0.12);
+}
+
+.editorial-frame::after {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  pointer-events: none;
+}
+
 .section-divider {
   border-top: 1px solid rgba(211, 196, 175, 0.45);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-slide 30s linear infinite;
+}
+
+@keyframes marquee-slide {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .marquee-track {
+    animation: none;
+    transform: translateX(0);
+  }
 }

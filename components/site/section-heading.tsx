@@ -16,10 +16,10 @@ export function SectionHeading({
       <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary">
         {eyebrow}
       </p>
-      <h2 className="mt-4 font-headline text-4xl leading-tight text-on-surface md:text-5xl">
+      <h2 className="mt-4 text-balance font-headline text-3xl leading-[1.02] text-on-surface sm:text-4xl md:text-5xl">
         {title}
       </h2>
-      <p className="mt-4 text-base leading-8 text-on-surface-variant md:text-lg">
+      <p className="mt-4 text-sm leading-7 text-on-surface-variant sm:text-base md:text-lg md:leading-8">
         {description}
       </p>
     </div>
