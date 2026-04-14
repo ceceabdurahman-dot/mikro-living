@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type { ReactNode } from 'react'
 
 import type { Metadata } from 'next'
@@ -23,10 +24,16 @@ export const metadata: Metadata = {
     title: siteMeta.title,
     description: 'Elegant & functional interior design studio in Jakarta and Bandung.',
   },
+=======
+export const metadata = {
+  title: 'MikroLiving',
+  description: 'MikroLiving CMS - Node.js + Express + MySQL Backend',
+>>>>>>> e72e8e145eed2e16f23b376e2c31383fdaaef41b
 }
 
 export default function RootLayout({
   children,
+<<<<<<< HEAD
 }: Readonly<{
   children: ReactNode
 }>) {
@@ -39,3 +46,14 @@ export default function RootLayout({
     </html>
   )
 }
+=======
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+>>>>>>> e72e8e145eed2e16f23b376e2c31383fdaaef41b

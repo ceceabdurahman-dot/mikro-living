@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -345,3 +346,13 @@ export default function HomePage() {
     </SiteShell>
   )
 }
+=======
+export default function Home() {
+  return (
+    <main>
+      <h1>Welcome to MikroLiving CMS</h1>
+      <p>Backend is running with Node.js + Express + MySQL</p>
+    </main>
+  )
+}
+>>>>>>> e72e8e145eed2e16f23b376e2c31383fdaaef41b
