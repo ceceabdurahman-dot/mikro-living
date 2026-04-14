@@ -1,8 +1,16 @@
-export default function RootLayout({ children }) {
-    return (
-        <html>
-            <head />
-            <body>{children}</body>
-        </html>
-    );
+export const metadata = {
+  title: 'MikroLiving',
+  description: 'MikroLiving CMS - Node.js + Express + MySQL Backend',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
 }
