@@ -21,12 +21,19 @@ export type Post = {
   sections: string[]
 }
 
+export type Service = {
+  slug: string
+  title: string
+  description: string
+  detail: string
+}
+
 export const siteMeta = {
   name: 'MikroLiving',
   title: 'MikroLiving | Designing Smart Living Spaces',
   description:
     'Creating elegant and functional interiors that resonate with your lifestyle and personality. Studio interior design Jakarta & Bandung.',
-  url: 'https://mikroliving.com',
+  url: 'https://mikroliving.id',
   locale: 'id_ID',
   keywords: [
     'interior design',
@@ -69,7 +76,7 @@ export const keywords = [
   'Micro Living',
 ]
 
-export const services = [
+export const services: Service[] = [
   {
     slug: 'interior-design',
     title: 'Interior Design',

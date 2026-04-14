@@ -3,8 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { getProjectBySlug, getProjects } from '@/lib/api'
 import { SiteShell } from '@/components/site/site-shell'
-import { projects } from '@/lib/site-data'
 
 type ProjectPageProps = {
   params: {
@@ -12,16 +12,14 @@ type ProjectPageProps = {
   }
 }
 
-function getProject(slug: string) {
-  return projects.find((project) => project.slug === slug)
-}
+export async function generateStaticParams() {
+  const projects = await getProjects()
 
-export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }))
 }
 
-export function generateMetadata({ params }: ProjectPageProps): Metadata {
-  const project = getProject(params.slug)
+export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
+  const project = await getProjectBySlug(params.slug)
 
   if (!project) {
     return {}
@@ -33,8 +31,11 @@ export function generateMetadata({ params }: ProjectPageProps): Metadata {
   }
 }
 
-export default function ProjectDetailPage({ params }: ProjectPageProps) {
-  const project = getProject(params.slug)
+export default async function ProjectDetailPage({ params }: ProjectPageProps) {
+  const [projects, project] = await Promise.all([
+    getProjects(),
+    getProjectBySlug(params.slug),
+  ])
 
   if (!project) {
     notFound()

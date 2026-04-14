@@ -1,15 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { getPosts, getProjects, getServices } from '@/lib/api'
 import { SectionHeading } from '@/components/site/section-heading'
 import { SiteShell } from '@/components/site/site-shell'
 import {
   heroStats,
   keywords,
-  posts,
   processSteps,
-  projects,
-  services,
   studioHighlights,
   testimonial,
 } from '@/lib/site-data'
@@ -26,9 +24,15 @@ const secondaryCtaClass =
 const lightSecondaryCtaClass =
   'inline-flex w-full items-center justify-center rounded-full border border-outline-variant/40 px-7 py-4 text-sm font-bold uppercase tracking-[0.2em] text-on-surface transition-[background-color,transform,border-color] duration-200 hover:border-outline-variant/70 hover:bg-white motion-safe:hover:-translate-y-1 motion-reduce:transform-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary sm:w-auto'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [projects, posts, services] = await Promise.all([
+    getProjects(),
+    getPosts(),
+    getServices(),
+  ])
+
   const featuredProject = projects[0]
-  const secondaryProject = projects[1]
+  const secondaryProject = projects[1] || featuredProject
   const supportingProjects = projects
   const featuredPost = posts[0]
   const supportingPosts = posts.slice(1)

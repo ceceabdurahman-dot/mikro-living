@@ -2,15 +2,16 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { getProjects } from '@/lib/api'
 import { SiteShell } from '@/components/site/site-shell'
-import { projects } from '@/lib/site-data'
 
 export const metadata: Metadata = {
   title: 'Projects | MikroLiving',
   description: 'A curated view of MikroLiving interior projects and compact living transformations.',
 }
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = await getProjects()
   const featuredProject = projects[0]
   const secondaryProjects = projects.slice(1)
   const years = projects

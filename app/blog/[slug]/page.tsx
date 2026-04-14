@@ -3,8 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { getPostBySlug, getPosts } from '@/lib/api'
 import { SiteShell } from '@/components/site/site-shell'
-import { posts } from '@/lib/site-data'
 
 type BlogPageProps = {
   params: {
@@ -12,16 +12,14 @@ type BlogPageProps = {
   }
 }
 
-function getPost(slug: string) {
-  return posts.find((post) => post.slug === slug)
-}
+export async function generateStaticParams() {
+  const posts = await getPosts()
 
-export function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }))
 }
 
-export function generateMetadata({ params }: BlogPageProps): Metadata {
-  const post = getPost(params.slug)
+export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug)
 
   if (!post) {
     return {}
@@ -33,8 +31,11 @@ export function generateMetadata({ params }: BlogPageProps): Metadata {
   }
 }
 
-export default function BlogDetailPage({ params }: BlogPageProps) {
-  const post = getPost(params.slug)
+export default async function BlogDetailPage({ params }: BlogPageProps) {
+  const [posts, post] = await Promise.all([
+    getPosts(),
+    getPostBySlug(params.slug),
+  ])
 
   if (!post) {
     notFound()

@@ -144,19 +144,20 @@ http://localhost:3000
 
 ## 6. Reverse proxy
 
-Recommended production routing:
+Recommended production routing for the current MikroLiving setup:
 
-- `https://your-domain.com` -> frontend container on port `3000`
-- `https://your-domain.com/api/v1` -> API container on port `5000`
+- `https://mikroliving.id` -> frontend container on port `3000`
+- `https://mikroliving.id/api/v1` -> API container on port `5000`
 
-If you use a reverse proxy on the same domain, set:
+Then set:
 
-- `NEXT_PUBLIC_API_URL=https://your-domain.com/api/v1`
-- `ALLOWED_ORIGINS=https://your-domain.com,https://www.your-domain.com`
+- `NEXT_PUBLIC_SITE_URL=https://mikroliving.id`
+- `NEXT_PUBLIC_API_URL=https://mikroliving.id/api/v1`
+- `ALLOWED_ORIGINS=https://mikroliving.id,https://www.mikroliving.id`
 
-A ready-to-adapt Nginx example is included at [deploy/nginx/mikroliving.conf](E:\xampp\htdocs\mikro-living\deploy\nginx\mikroliving.conf). Replace:
+A ready-to-adapt Nginx example is included at [mikroliving.id.conf](/D:/Cece%20Abdurahman/Bisnis/Interior/mikro-living/mikro-living/deploy/nginx/mikroliving.id.conf:1). Replace:
 
-- `your-domain.com` with your real domain
+- `mikroliving.id` only if you intentionally use a different domain
 - Let’s Encrypt certificate paths with your issued cert paths
 - upstream host/ports if you proxy to a different machine
 
@@ -165,6 +166,16 @@ Suggested server layout:
 - Nginx on the host
 - Docker Compose stack exposing `3000` and `5000` locally
 - SSL terminated at Nginx
+
+Hostinger quick install after the repo is on the VPS:
+
+```bash
+cd /path/to/mikroliving
+chmod +x deploy/nginx/install-mikroliving-nginx.sh
+./deploy/nginx/install-mikroliving-nginx.sh "$(pwd)"
+```
+
+If `nginx -t` reports a duplicate `server_name` for `mikroliving.id`, disable the older site config first, then rerun the script.
 
 ## 7. Healthchecks
 

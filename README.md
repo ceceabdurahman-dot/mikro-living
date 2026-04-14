@@ -117,7 +117,7 @@ JWT_REFRESH_SECRET=ganti-dengan-string-acak-lainnya
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-ADMIN_EMAIL=admin@mikroliving.com
+ADMIN_EMAIL=admin@mikroliving.id
 ADMIN_PASSWORD=Admin@Mikro2024!
 ALLOWED_ORIGINS=http://localhost:3000
 ```
@@ -279,7 +279,7 @@ vercel login
 vercel
 
 # Set environment variables di Vercel Dashboard:
-# NEXT_PUBLIC_API_URL  = https://api.mikroliving.com/api/v1
+# NEXT_PUBLIC_API_URL  = https://mikroliving.id/api/v1
 # NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = your_cloud_name
 ```
 
@@ -318,17 +318,27 @@ pm2 startup
 pm2 save
 
 # Nginx reverse proxy
-# Arahkan api.mikroliving.com → localhost:5000
+# Arahkan mikroliving.id/api/v1/ ke localhost:5000
 ```
 
 **Nginx config contoh:**
 ```nginx
 server {
     listen 80;
-    server_name api.mikroliving.com;
+    server_name mikroliving.id;
+
+    location /api/v1/ {
+        proxy_pass http://localhost:5000/api/v1/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_cache_bypass $http_upgrade;
+    }
 
     location / {
-        proxy_pass http://localhost:5000;
+        proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -348,14 +358,14 @@ server {
 ### Login ke CMS
 
 Setelah seed, login menggunakan:
-- **Email:** `admin@mikroliving.com`
+- **Email:** `admin@mikroliving.id`
 - **Password:** `Admin@Mikro2024!`
 
 ### Endpoint login:
 ```bash
 curl -X POST http://localhost:5000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@mikroliving.com","password":"Admin@Mikro2024!"}'
+  -d '{"email":"admin@mikroliving.id","password":"Admin@Mikro2024!"}'
 ```
 
 Response: `{ "data": { "accessToken": "eyJ..." } }`

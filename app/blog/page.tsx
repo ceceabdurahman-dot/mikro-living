@@ -2,15 +2,16 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { getPosts } from '@/lib/api'
 import { SiteShell } from '@/components/site/site-shell'
-import { posts } from '@/lib/site-data'
 
 export const metadata: Metadata = {
   title: 'Journal | MikroLiving',
   description: 'Editorial notes on compact living, warm materials, and spatial clarity.',
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getPosts()
   const featuredPost = posts[0]
   const secondaryPosts = posts.slice(1)
 

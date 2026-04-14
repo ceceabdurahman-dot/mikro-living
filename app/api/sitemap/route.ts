@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
 
-import { posts, projects, siteMeta } from '@/lib/site-data'
+import { getPosts, getProjects } from '@/lib/api'
+import { siteMeta } from '@/lib/site-data'
 
-export function GET() {
+export async function GET() {
+  const [projects, posts] = await Promise.all([getProjects(), getPosts()])
   const routes = [
     '/',
     '/projects',

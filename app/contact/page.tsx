@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { ContactIntakeForm } from '@/components/site/contact-intake-form'
 import { SiteShell } from '@/components/site/site-shell'
-import { services } from '@/lib/site-data'
+import { getServices } from '@/lib/api'
 
 export const metadata: Metadata = {
   title: 'Consultation | MikroLiving',
@@ -31,12 +32,9 @@ const briefingChecklist = [
   'The one friction point that makes the room feel smaller than it should',
 ]
 
-const formFields = [
-  { label: 'Name', placeholder: 'Your name', type: 'text' },
-  { label: 'Email', placeholder: 'you@example.com', type: 'email' },
-]
+export default async function ContactPage() {
+  const services = await getServices()
 
-export default function ContactPage() {
   return (
     <SiteShell>
       <main id="main-content">
@@ -57,8 +55,8 @@ export default function ContactPage() {
               </h1>
               <p className="mt-6 max-w-3xl text-base leading-8 text-stone-300 md:text-lg">
                 This intake is shaped like the final studio consultation flow: direct, spatial, and
-                tuned around daily living. Backend submission is still paused, but the page now
-                feels like a real first conversation instead of a temporary placeholder.
+                tuned around daily living. It now attempts to submit through the studio API while
+                still keeping the page resilient if that backend is temporarily offline.
               </p>
 
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -112,8 +110,8 @@ export default function ContactPage() {
                     Response note
                   </p>
                   <p className="mt-3 text-sm leading-7 text-on-surface-variant">
-                    When the backend reconnects, this route is ready to carry a real consultation
-                    brief without another redesign pass.
+                    This route is already prepared to carry a real consultation brief without
+                    another redesign pass.
                   </p>
                 </div>
               </div>
@@ -179,8 +177,9 @@ export default function ContactPage() {
                     Share the project in the same order we would discuss it in studio.
                   </h2>
                   <p className="mt-4 max-w-sm text-sm leading-7 text-on-surface-variant">
-                    The structure below is already ready for final wiring. Right now it behaves as a
-                    static intake so the route stays polished while backend handoff is restored.
+                    The structure below is now wired for live intake submission. It still degrades
+                    gracefully if the backend is offline, so the route stays reliable during
+                    recovery work.
                   </p>
 
                   <div className="mt-8 rounded-[1.5rem] bg-white p-5 shadow-lg shadow-stone-900/5">
@@ -188,8 +187,9 @@ export default function ContactPage() {
                       Current status
                     </p>
                     <p className="mt-3 text-sm leading-7 text-on-surface-variant">
-                      Submission is intentionally paused. Once the original endpoint returns, this
-                      form can reconnect without changing the visual flow.
+                      Submission now targets the consultation endpoint again. If the original API is
+                      still unavailable, the form will return a clear status instead of silently
+                      failing.
                     </p>
                     <Link
                       href="/projects"
@@ -200,65 +200,7 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <form className="px-6 py-7 sm:px-8 sm:py-9">
-                  <div className="grid gap-5 md:grid-cols-2">
-                    {formFields.map((field) => (
-                      <label key={field.label} className="grid gap-2 text-sm font-medium text-on-surface">
-                        {field.label}
-                        <input
-                          type={field.type}
-                          placeholder={field.placeholder}
-                          className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-                        />
-                      </label>
-                    ))}
-                  </div>
-
-                  <div className="mt-5 grid gap-5 md:grid-cols-2">
-                    <label className="grid gap-2 text-sm font-medium text-on-surface">
-                      Project type
-                      <input
-                        type="text"
-                        placeholder="Apartment, residence, or studio"
-                        className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-                      />
-                    </label>
-
-                    <label className="grid gap-2 text-sm font-medium text-on-surface">
-                      Timing
-                      <input
-                        type="text"
-                        placeholder="Preferred start month or handover target"
-                        className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-                      />
-                    </label>
-                  </div>
-
-                  <label className="mt-5 grid gap-2 text-sm font-medium text-on-surface">
-                    Project brief
-                    <textarea
-                      rows={6}
-                      placeholder="Tell us about the room, the mood you want, what feels unresolved, and how the space should support daily life more clearly."
-                      className="rounded-[1.5rem] border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-                    />
-                  </label>
-
-                  <div className="mt-6 rounded-[1.5rem] bg-stone-950 p-5 text-white">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                      <p className="max-w-xl text-sm leading-7 text-stone-300">
-                        The button stays disabled until backend intake is live again. The page is
-                        already composed for the final consultation flow.
-                      </p>
-                      <button
-                        type="button"
-                        disabled
-                        className="inline-flex w-full items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-on-primary opacity-60 sm:w-auto"
-                      >
-                        Consultation intake pending
-                      </button>
-                    </div>
-                  </div>
-                </form>
+                <ContactIntakeForm />
               </div>
             </div>
           </div>
