@@ -155,6 +155,12 @@ Then set:
 - `NEXT_PUBLIC_API_URL=https://mikroliving.id/api/v1`
 - `ALLOWED_ORIGINS=https://mikroliving.id,https://www.mikroliving.id`
 
+If the public website stays on Hostinger hPanel/Node.js hosting and the live backend runs elsewhere, also set:
+
+- `API_PROXY_TARGET=https://your-live-backend.example.com/api/v1`
+
+With that env in place, the Next.js app will proxy `https://mikroliving.id/api/v1/*` through the app server to the live backend target.
+
 A ready-to-adapt Nginx example is included at [mikroliving.id.conf](/D:/Cece%20Abdurahman/Bisnis/Interior/mikro-living/mikro-living/deploy/nginx/mikroliving.id.conf:1). Replace:
 
 - `mikroliving.id` only if you intentionally use a different domain
@@ -176,6 +182,22 @@ chmod +x deploy/nginx/install-mikroliving-nginx.sh
 ```
 
 If `nginx -t` reports a duplicate `server_name` for `mikroliving.id`, disable the older site config first, then rerun the script.
+
+## 6a. Same-domain path on Hostinger Node.js hosting
+
+If `mikroliving.id` is currently served by Hostinger hPanel and not by your VPS, keep the public API URL on the main domain and configure the backend target in the Node.js app instead:
+
+```env
+NEXT_PUBLIC_API_URL=https://mikroliving.id/api/v1
+API_PROXY_TARGET=https://your-live-backend.example.com/api/v1
+```
+
+After redeploying the Node.js app, verify:
+
+```bash
+curl -I https://mikroliving.id/api/v1/health
+curl -I https://mikroliving.id/api/v1/projects
+```
 
 ## 7. Healthchecks
 

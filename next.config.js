@@ -1,3 +1,5 @@
+const apiProxyTarget = process.env.API_PROXY_TARGET?.replace(/\/$/, '')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
@@ -20,6 +22,18 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
+  },
+  async rewrites() {
+    if (!apiProxyTarget) {
+      return []
+    }
+
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: `${apiProxyTarget}/:path*`,
+      },
+    ]
   },
 }
 

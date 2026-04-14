@@ -44,7 +44,7 @@ function isDefined<T>(value: T | null): value is T {
 }
 
 function getApiBaseUrl() {
-  const baseUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
+  const baseUrl = process.env.API_URL || process.env.API_PROXY_TARGET || process.env.NEXT_PUBLIC_API_URL
 
   return baseUrl ? baseUrl.replace(/\/$/, '') : null
 }
