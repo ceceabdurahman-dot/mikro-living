@@ -13,36 +13,39 @@ type LoginPageProps = {
 }
 
 const accessNotes = [
-  'The route and redirect contract are already preserved.',
-  'Protected CMS navigation can reconnect here without changing the UI entry point.',
-  'Authentication stays paused until the original backend handoff is restored.',
+  'The redirect contract remains preserved, so CMS routing can reconnect cleanly.',
+  'This page now reads like a deliberate studio access surface rather than a temporary stop.',
+  'Authentication is still paused until the original backend handoff is restored.',
 ]
 
 export default function LoginPage({ searchParams }: LoginPageProps) {
   const redirectTarget = searchParams?.redirect || '/cms'
 
   return (
-    <main className="relative z-10 min-h-screen overflow-hidden px-6 py-8 md:px-8 md:py-10">
+    <main className="relative isolate min-h-screen overflow-hidden bg-stone-950 px-6 py-8 text-white md:px-8 md:py-10">
       <div className="absolute inset-0">
-        <div className="absolute left-[-10rem] top-[-4rem] h-80 w-80 rounded-full bg-primary-fixed/60 blur-3xl" />
-        <div className="absolute right-[-10rem] bottom-[-6rem] h-96 w-96 rounded-full bg-stone-200/70 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(217,119,6,0.34),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(245,245,244,0.12),_transparent_34%)]" />
+        <div className="absolute left-[12%] top-0 hidden h-full w-px bg-white/10 lg:block" />
+        <div className="absolute right-[8%] top-24 hidden h-px w-40 bg-white/15 lg:block" />
       </div>
 
-      <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-6xl gap-8 rounded-[2rem] border border-outline-variant/20 bg-white/80 p-6 shadow-2xl shadow-stone-900/10 backdrop-blur sm:p-8 lg:grid-cols-[0.92fr_1.08fr] lg:p-12">
-        <div className="flex flex-col justify-between gap-8">
+      <div className="relative mx-auto grid min-h-[calc(100svh-4rem)] max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div className="flex flex-col justify-between gap-10">
           <div>
-            <Link href="/" className="text-2xl font-headline italic text-on-surface">
-              Mikro<span className="text-primary">Living</span>
+            <Link href="/" className="inline-flex text-2xl font-headline italic text-white">
+              Mikro<span className="text-primary-fixed-dim">Living</span>
             </Link>
 
-            <p className="mt-10 text-xs font-bold uppercase tracking-[0.35em] text-primary">
+            <p className="mt-12 text-xs font-bold uppercase tracking-[0.35em] text-primary-fixed-dim">
               CMS Access
             </p>
-            <h1 className="mt-4 max-w-xl text-balance font-headline text-4xl leading-[1.02] text-on-surface sm:text-5xl">
-              A clean sign-in point for the studio workspace, ready for auth to reconnect.
+            <h1 className="mt-5 max-w-xl text-balance font-headline text-4xl leading-[0.96] text-white sm:text-5xl lg:text-6xl">
+              Studio access with a calmer, more precise arrival.
             </h1>
-            <p className="mt-5 max-w-lg text-base leading-8 text-on-surface-variant">
-              This page now behaves like a deliberate studio login surface rather than a temporary redirect stop. The form is styled, stable, and waiting for the final authentication layer to slot in.
+            <p className="mt-6 max-w-lg text-base leading-8 text-stone-300">
+              The page now carries the same tone as the rest of the site: darker, cleaner, and more
+              intentional. It is ready for authentication to reconnect without redesigning the
+              visual entry point.
             </p>
           </div>
 
@@ -50,97 +53,117 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
             {accessNotes.map((item, index) => (
               <div
                 key={item}
-                className={`rounded-[1.5rem] border border-outline-variant/20 p-5 ${
-                  index === 1 ? 'bg-stone-900 text-white' : 'bg-background/70'
-                }`}
+                className={`rounded-[1.75rem] border p-5 ${
+                  index === 1
+                    ? 'border-white/10 bg-white/[0.08]'
+                    : 'border-white/12 bg-white/[0.04]'
+                } ${index === 2 ? 'lg:translate-x-8' : ''}`}
               >
-                <p
-                  className={`text-[10px] font-bold uppercase tracking-[0.32em] ${
-                    index === 1 ? 'text-primary-fixed-dim' : 'text-primary'
-                  }`}
-                >
+                <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-primary-fixed-dim">
                   0{index + 1}
                 </p>
-                <p
-                  className={`mt-3 text-sm leading-7 ${
-                    index === 1 ? 'text-stone-300' : 'text-on-surface-variant'
-                  }`}
-                >
-                  {item}
-                </p>
+                <p className="mt-3 text-sm leading-7 text-stone-200">{item}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="grid gap-6 rounded-[2rem] border border-outline-variant/20 bg-background/85 p-6 sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
+        <div className="editorial-frame overflow-hidden rounded-[2.25rem] bg-white text-stone-950 shadow-2xl shadow-black/25">
+          <div className="grid gap-0 lg:grid-cols-[0.44fr_0.56fr]">
+            <div className="bg-stone-100 px-6 py-7 sm:px-8 sm:py-9">
               <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary">
-                Sign In
+                Access note
               </p>
-              <p className="mt-3 max-w-md text-sm leading-7 text-on-surface-variant">
-                Studio access stays intentionally paused until backend credentials and session handoff are restored.
+              <h2 className="mt-4 max-w-sm text-balance font-headline text-3xl leading-tight text-on-surface sm:text-[2.1rem]">
+                The route is intact. The credentials layer is the only piece still missing.
+              </h2>
+              <p className="mt-4 max-w-sm text-sm leading-7 text-on-surface-variant">
+                We are preserving the real redirect target and entry flow, so once auth is restored
+                the studio team can step back in without a new UX pass.
               </p>
-            </div>
 
-            <div className="rounded-[1.5rem] border border-outline-variant/20 bg-white/80 px-4 py-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-on-surface-variant">
-                Redirect after sign-in
-              </p>
-              <p className="mt-2 break-all font-mono text-xs text-on-surface">{redirectTarget}</p>
-            </div>
-          </div>
+              <div className="mt-8 rounded-[1.5rem] bg-white p-5 shadow-lg shadow-stone-900/5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-primary">
+                  Redirect after sign-in
+                </p>
+                <p className="mt-3 break-all font-mono text-xs text-on-surface">{redirectTarget}</p>
+              </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
-            <label className="grid gap-2 text-sm font-medium text-on-surface">
-              Email
-              <input
-                type="email"
-                placeholder="admin@mikroliving.com"
-                className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-              />
-            </label>
-
-            <label className="grid gap-2 text-sm font-medium text-on-surface">
-              Password
-              <input
-                type="password"
-                placeholder="Password"
-                className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-              />
-            </label>
-          </div>
-
-          <label className="grid gap-2 text-sm font-medium text-on-surface">
-            Workspace note
-            <textarea
-              rows={4}
-              placeholder="Optional notes for the eventual handoff, such as environment, role, or redirect context."
-              className="rounded-[1.5rem] border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
-            />
-          </label>
-
-          <div className="flex flex-col gap-4 border-t border-outline-variant/20 pt-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm leading-7 text-on-surface-variant">
-                Sign-in stays non-submitting for now, but this route is visually and structurally ready for the final auth connection.
-              </p>
               <Link
                 href="/contact"
-                className="mt-4 inline-flex text-xs font-bold uppercase tracking-[0.35em] text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                className="mt-6 inline-flex text-xs font-bold uppercase tracking-[0.35em] text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
               >
                 Need studio assistance?
               </Link>
             </div>
 
-            <button
-              type="button"
-              disabled
-              className="inline-flex w-full items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-on-primary opacity-60 sm:w-auto"
-            >
-              Authentication paused
-            </button>
+            <div className="px-6 py-7 sm:px-8 sm:py-9">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary">
+                    Sign in
+                  </p>
+                  <p className="mt-3 max-w-md text-sm leading-7 text-on-surface-variant">
+                    Inputs stay visible and stable while backend credentials, sessions, and protected
+                    CMS handoff are being reconnected.
+                  </p>
+                </div>
+
+                <div className="rounded-[1.5rem] bg-stone-950 px-4 py-3 text-white">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-primary-fixed-dim">
+                    Status
+                  </p>
+                  <p className="mt-2 text-xs font-medium uppercase tracking-[0.28em] text-stone-200">
+                    Authentication paused
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-5 md:grid-cols-2">
+                <label className="grid gap-2 text-sm font-medium text-on-surface">
+                  Email
+                  <input
+                    type="email"
+                    placeholder="admin@mikroliving.com"
+                    className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm font-medium text-on-surface">
+                  Password
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    className="rounded-2xl border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
+                  />
+                </label>
+              </div>
+
+              <label className="mt-5 grid gap-2 text-sm font-medium text-on-surface">
+                Workspace note
+                <textarea
+                  rows={4}
+                  placeholder="Optional context for the final handoff, such as role, environment, or redirect expectations."
+                  className="rounded-[1.5rem] border border-outline-variant/40 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/70 focus:border-primary"
+                />
+              </label>
+
+              <div className="mt-6 rounded-[1.5rem] bg-stone-950 p-5 text-white">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                  <p className="max-w-xl text-sm leading-7 text-stone-300">
+                    Sign-in remains non-submitting for now, but the screen is already ready for the
+                    final authentication layer.
+                  </p>
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex w-full items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-on-primary opacity-60 sm:w-auto"
+                  >
+                    Authentication paused
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

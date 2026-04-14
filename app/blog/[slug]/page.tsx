@@ -42,131 +42,143 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
 
   const postIndex = posts.findIndex((entry) => entry.slug === post.slug)
   const nextPost = posts[(postIndex + 1) % posts.length]
-  const sectionPreviews = post.sections.map((section) => section.split('. ')[0])
 
   return (
     <SiteShell>
-      <main id="main-content" className="pt-20">
-        <article className="relative overflow-hidden px-6 pb-16 pt-8 md:px-8 md:pb-20 md:pt-10">
+      <main id="main-content">
+        <section className="relative isolate overflow-hidden bg-stone-950 text-white">
           <div className="absolute inset-0">
-            <div className="absolute right-[-8rem] top-0 h-64 w-64 rounded-full bg-primary-fixed/50 blur-3xl" />
-            <div className="absolute left-[-6rem] top-64 h-56 w-56 rounded-full bg-stone-200/80 blur-3xl" />
+            <Image
+              src={post.image}
+              alt={post.title}
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(20,18,14,0.9)_0%,rgba(20,18,14,0.78)_34%,rgba(20,18,14,0.28)_68%,rgba(20,18,14,0.34)_100%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,rgba(247,189,72,0.2),transparent_24%),radial-gradient(circle_at_84%_20%,rgba(255,255,255,0.08),transparent_20%)]" />
           </div>
 
-          <div className="relative mx-auto max-w-7xl">
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.35em] text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-            >
-              Back to journal
-            </Link>
-
-            <div className="mt-8 grid gap-10 xl:grid-cols-[1.05fr_0.95fr] xl:items-start">
+          <div className="relative z-10 flex min-h-[82svh] items-end px-6 pb-12 pt-28 md:px-8 md:pb-16">
+            <div className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[0.84fr_0.16fr] lg:items-end">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary">
+                <Link
+                  href="/blog"
+                  className="inline-flex text-[10px] font-bold uppercase tracking-[0.35em] text-primary-fixed-dim focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-fixed-dim"
+                >
+                  Back to journal
+                </Link>
+
+                <p className="mt-8 text-xs font-bold uppercase tracking-[0.35em] text-primary-fixed-dim">
                   {post.category}
                 </p>
-                <h1 className="mt-4 max-w-4xl text-balance font-headline text-4xl leading-[0.98] text-on-surface sm:text-5xl md:text-6xl">
+                <h1 className="mt-4 max-w-5xl text-balance font-headline text-5xl leading-[0.94] text-white sm:text-6xl md:text-7xl">
                   {post.title}
                 </h1>
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-on-surface-variant md:text-xl">
+                <p className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg">
                   {post.summary}
                 </p>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-                <div className="rounded-[1.75rem] border border-outline-variant/20 bg-white/80 p-6 shadow-lg shadow-stone-900/5">
-                  <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary">
-                    Editorial Note
-                  </p>
-                  <p className="mt-4 text-sm leading-7 text-on-surface-variant">
-                    The journal is where the studio distills practical design thinking into short, useful reads about compact living and residential clarity.
-                  </p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    <span className="rounded-full border border-outline-variant/35 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-on-surface-variant">
-                      Compact living
-                    </span>
-                    <span className="rounded-full border border-outline-variant/35 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-on-surface-variant">
-                      Material warmth
-                    </span>
-                    <span className="rounded-full border border-outline-variant/35 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-on-surface-variant">
-                      Daily function
-                    </span>
-                  </div>
-                </div>
-
-                <div className="rounded-[1.75rem] bg-stone-900 p-6 text-white shadow-2xl shadow-stone-900/10">
-                  <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary-fixed-dim">
-                    In This Note
-                  </p>
-                  <div className="mt-5 space-y-4">
-                    {sectionPreviews.map((section, index) => (
-                      <div key={section} className="border-t border-white/10 pt-4 first:border-t-0 first:pt-0">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-primary-fixed-dim">
-                          0{index + 1}
-                        </p>
-                        <p className="mt-2 text-sm leading-7 text-stone-300">{section}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative mt-12 min-h-[320px] overflow-hidden rounded-[2rem] shadow-2xl shadow-stone-900/10 sm:min-h-[420px] md:min-h-[560px]">
-              <Image
-                src={post.image}
-                alt={post.title}
-                fill
-                className="object-cover"
-                sizes="100vw"
-                priority
-              />
-            </div>
-
-            <div className="mt-12 grid gap-8 xl:grid-cols-[0.34fr_0.66fr]">
-              <aside className="space-y-6">
-                <div className="rounded-[1.75rem] border border-outline-variant/20 bg-white/80 p-6 shadow-lg shadow-stone-900/5">
-                  <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary">
-                    Reading Lens
-                  </p>
-                  <p className="mt-4 text-sm leading-7 text-on-surface-variant">
-                    The strongest small-space interiors are shaped by what disappears: clutter, friction, and unnecessary visual breaks.
-                  </p>
-                </div>
-
-                <Link
-                  href={`/blog/${nextPost.slug}`}
-                  className="block rounded-[1.75rem] border border-outline-variant/20 bg-background/70 p-6 transition-transform duration-200 motion-safe:hover:-translate-y-1 motion-reduce:transform-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-                >
-                  <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary">
-                    Next Note
-                  </p>
-                  <h2 className="mt-3 text-balance font-headline text-2xl text-on-surface">
-                    {nextPost.title}
-                  </h2>
-                  <p className="mt-3 text-sm leading-7 text-on-surface-variant">
-                    {nextPost.excerpt}
-                  </p>
-                </Link>
-              </aside>
-
-              <div className="space-y-5">
-                {post.sections.map((section, index) => (
-                  <section
-                    key={section}
-                    className="rounded-[1.75rem] border border-outline-variant/20 bg-white/80 p-6 shadow-lg shadow-stone-900/5 sm:p-8"
-                  >
-                    <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-primary">
-                      Section 0{index + 1}
-                    </p>
-                    <p className="mt-4 text-base leading-8 text-on-surface-variant">{section}</p>
-                  </section>
-                ))}
+              <div className="hidden lg:block">
+                <p className="border-t border-white/15 pt-5 text-sm leading-7 text-white/60">
+                  A studio note on spatial clarity, warmth, and the subtle design decisions that make compact rooms feel more generous.
+                </p>
               </div>
             </div>
           </div>
-        </article>
+        </section>
+
+        <section className="px-6 py-24 md:px-8">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.34fr_0.66fr]">
+            <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
+              <div className="rounded-[1.75rem] bg-stone-950 p-6 text-white">
+                <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-primary-fixed-dim">
+                  In this note
+                </p>
+                <div className="mt-5 space-y-4">
+                  {post.sections.map((section, index) => (
+                    <div key={section} className="border-t border-white/10 pt-4 first:border-t-0 first:pt-0">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-primary-fixed-dim">
+                        0{index + 1}
+                      </p>
+                      <p className="mt-2 text-sm leading-7 text-stone-300">
+                        {section.split('. ')[0]}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[1.75rem] border border-outline-variant/20 bg-white/80 p-6 shadow-lg shadow-stone-900/5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-primary">
+                  Reading lens
+                </p>
+                <p className="mt-4 text-sm leading-7 text-on-surface-variant">
+                  The point is not to add more to a room. It is to remove friction until the space feels calmer, clearer, and easier to inhabit.
+                </p>
+              </div>
+            </aside>
+
+            <div className="space-y-6">
+              {post.sections.map((section, index) => (
+                <section
+                  key={section}
+                  className={`rounded-[2rem] border border-outline-variant/20 bg-white/80 p-6 shadow-lg shadow-stone-900/5 sm:p-8 ${
+                    index % 2 === 1 ? 'md:translate-x-8' : ''
+                  }`}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-primary">
+                    Section 0{index + 1}
+                  </p>
+                  <p className="mt-4 text-base leading-8 text-on-surface-variant">{section}</p>
+                </section>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-stone-950 px-6 py-20 text-white md:px-8">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.35em] text-primary-fixed-dim">
+                Next note
+              </p>
+              <h2 className="mt-4 max-w-2xl text-balance font-headline text-4xl leading-[1.02] text-white sm:text-5xl">
+                Keep moving through the editorial sequence.
+              </h2>
+              <p className="mt-4 max-w-xl text-base leading-8 text-stone-400">
+                Each note sharpens a different design instinct, from layout logic and material warmth to the subtler ways rooms can feel lighter.
+              </p>
+            </div>
+
+            <Link
+              href={`/blog/${nextPost.slug}`}
+              className="editorial-frame group relative block min-h-[340px] overflow-hidden"
+            >
+              <Image
+                src={nextPost.image}
+                alt={nextPost.title}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+                sizes="(max-width: 1024px) 100vw, 46vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/15 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-primary-fixed-dim">
+                  {nextPost.category}
+                </p>
+                <h3 className="mt-3 text-balance font-headline text-4xl leading-none">
+                  {nextPost.title}
+                </h3>
+                <p className="mt-3 max-w-lg text-sm leading-7 text-white/70">
+                  {nextPost.excerpt}
+                </p>
+              </div>
+            </Link>
+          </div>
+        </section>
       </main>
     </SiteShell>
   )
