@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
+const PROXY_REQUEST_TIMEOUT_MS = 5000
 
 const HOP_BY_HOP_HEADERS = new Set([
   'connection',
@@ -96,6 +97,8 @@ async function proxyToBackend(request: NextRequest, path: string[]) {
 
   const method = request.method.toUpperCase()
   const body = method === 'GET' || method === 'HEAD' ? undefined : await request.arrayBuffer()
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), PROXY_REQUEST_TIMEOUT_MS)
 
   try {
     const response = await fetch(targetUrl, {
@@ -104,17 +107,25 @@ async function proxyToBackend(request: NextRequest, path: string[]) {
       body,
       cache: 'no-store',
       redirect: 'manual',
+      signal: controller.signal,
     })
 
     return new NextResponse(response.body, {
       status: response.status,
       headers: copyResponseHeaders(response),
     })
-  } catch {
+  } catch (error) {
+    const message =
+      error instanceof Error && error.name === 'AbortError'
+        ? `The backend API did not respond within ${PROXY_REQUEST_TIMEOUT_MS}ms.`
+        : 'The backend API is unreachable right now.'
+
     return NextResponse.json(
-      { message: 'The backend API is unreachable right now.' },
+      { message },
       { status: 503, headers: { 'Cache-Control': 'no-store' } },
     )
+  } finally {
+    clearTimeout(timeoutId)
   }
 }
 
