@@ -128,6 +128,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
   return proxyToBackend(request, context.params.path)
 }
 
+export async function HEAD(request: NextRequest, context: RouteContext) {
+  return proxyToBackend(request, context.params.path)
+}
+
 export async function POST(request: NextRequest, context: RouteContext) {
   return proxyToBackend(request, context.params.path)
 }
