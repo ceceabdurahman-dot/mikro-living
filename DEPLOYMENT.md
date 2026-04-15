@@ -147,19 +147,17 @@ http://localhost:3000
 Recommended production routing for the current MikroLiving setup:
 
 - `https://mikroliving.id` -> frontend container on port `3000`
-- `https://mikroliving.id/api/v1` -> API container on port `5000`
+- `https://api.mikroliving.id/api/v1` -> API container or PM2 process on port `5100`
+- `https://mikroliving.id/api/v1` -> internal Next.js proxy route that forwards to `https://api.mikroliving.id/api/v1`
 
 Then set:
 
 - `NEXT_PUBLIC_SITE_URL=https://mikroliving.id`
 - `NEXT_PUBLIC_API_URL=https://mikroliving.id/api/v1`
-- `ALLOWED_ORIGINS=https://mikroliving.id,https://www.mikroliving.id`
+- `API_URL=https://api.mikroliving.id/api/v1`
+- `ALLOWED_ORIGINS=https://mikroliving.id,https://www.mikroliving.id,https://api.mikroliving.id`
 
-If the public website stays on Hostinger hPanel/Node.js hosting and the live backend runs elsewhere, also set:
-
-- `API_PROXY_TARGET=https://your-live-backend.example.com/api/v1`
-
-With that env in place, the Next.js app will proxy `https://mikroliving.id/api/v1/*` through the app server to the live backend target.
+If the public website stays on Hostinger hPanel/Node.js hosting and the live backend runs on your VPS, leave `API_PROXY_TARGET` empty and use `API_URL` as the backend origin. The built-in App Router proxy at `/api/v1/[...path]` will forward same-domain API requests through the app server to the backend origin.
 
 A ready-to-adapt Nginx example is included at [mikroliving.id.conf](/D:/Cece%20Abdurahman/Bisnis/Interior/mikro-living/mikro-living/deploy/nginx/mikroliving.id.conf:1). Replace:
 
@@ -189,7 +187,8 @@ If `mikroliving.id` is currently served by Hostinger hPanel and not by your VPS,
 
 ```env
 NEXT_PUBLIC_API_URL=https://mikroliving.id/api/v1
-API_PROXY_TARGET=https://your-live-backend.example.com/api/v1
+API_URL=https://api.mikroliving.id/api/v1
+API_PROXY_TARGET=
 ```
 
 After redeploying the Node.js app, verify:
@@ -198,6 +197,26 @@ After redeploying the Node.js app, verify:
 curl -I https://mikroliving.id/api/v1/health
 curl -I https://mikroliving.id/api/v1/projects
 ```
+
+## 6b. HTTPS backend subdomain on Hostinger VPS + OpenLiteSpeed
+
+Recommended when the backend runs on your VPS and the frontend stays on Hostinger hPanel:
+
+1. Create a DNS `A` record for `api.mikroliving.id` pointing to your VPS IPv4.
+2. In OpenLiteSpeed, create or reuse an HTTPS listener on port `443`.
+3. Add a dedicated virtual host for `api.mikroliving.id`.
+4. Attach the SSL certificate issued for `api.mikroliving.id`.
+5. Reverse-proxy that vhost to `127.0.0.1:5100`.
+6. Keep the frontend on `mikroliving.id`, but point its server-side API origin to `https://api.mikroliving.id/api/v1`.
+
+Then verify:
+
+```bash
+curl -I https://api.mikroliving.id/api/v1/health
+curl -I https://mikroliving.id/api/v1/health
+```
+
+An OpenLiteSpeed-oriented checklist is included at [deploy/openlitespeed/api.mikroliving.id.md](/D:/Cece%20Abdurahman/Bisnis/Interior/mikro-living/mikro-living/deploy/openlitespeed/api.mikroliving.id.md).
 
 ## 7. Healthchecks
 

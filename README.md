@@ -280,6 +280,7 @@ vercel
 
 # Set environment variables di Vercel Dashboard:
 # NEXT_PUBLIC_API_URL  = https://mikroliving.id/api/v1
+# API_URL              = https://api.mikroliving.id/api/v1
 # NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = your_cloud_name
 ```
 
@@ -317,8 +318,11 @@ pm2 start src/index.js --name "mikroliving-api"
 pm2 startup
 pm2 save
 
-# Nginx reverse proxy
-# Arahkan mikroliving.id/api/v1/ ke localhost:5000
+# Reverse proxy
+# Rekomendasi stabil:
+# - frontend public tetap di https://mikroliving.id
+# - backend diexpose di https://api.mikroliving.id/api/v1
+# - frontend memproxy same-domain /api/v1 ke subdomain API tersebut
 ```
 
 **Nginx config contoh:**
