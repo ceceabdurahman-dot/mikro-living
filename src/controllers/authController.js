@@ -305,7 +305,7 @@ exports.forgotPassword = async (req, res) => {
     if (process.env.NODE_ENV !== 'production') {
       return api.success(res, { preview_url: resetUrl, email_skipped: true }, genericMessage)
     }
-    return api.error(res, 'Gagal mengirim email reset password.', 500)
+    return api.success(res, null, genericMessage)
   }
 }
 

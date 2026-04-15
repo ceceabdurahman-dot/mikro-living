@@ -492,3 +492,70 @@ test('bulk update user status rejects malformed boolean payloads', async () => {
     restore()
   }
 })
+
+test('forgot password keeps generic response when delivery fails in production', async () => {
+  process.env.NODE_ENV = 'production'
+  process.env.JWT_SECRET = 'test-jwt-secret-32-characters-long'
+
+  let successPayload = null
+  let errorCalled = false
+
+  const user = {
+    id: 18,
+    email: 'admin@mikroliving.test',
+    name: 'Admin',
+    password: '$2a$12$hashed-password-value',
+    is_active: true,
+  }
+
+  const { controller, restore } = loadControllerWithMocks({
+    models: {
+      User: {
+        findOne: async ({ where }) => (where?.email === user.email ? user : null),
+      },
+    },
+    apiResponse: {
+      ...noopApiResponse,
+      success: (res, data, message) => {
+        successPayload = { data, message }
+        return { ok: true, data, message }
+      },
+      error: () => {
+        errorCalled = true
+        return { ok: false }
+      },
+    },
+    logger: noopLogger,
+    email: {
+      sendMail: async () => {
+        throw new Error('smtp unavailable')
+      },
+    },
+    cloudinary: { deleteFromCloudinary: async () => {} },
+    authCookies: {
+      REFRESH_COOKIE_NAME: 'ml_refresh_token',
+      clearAuthCookies: () => {},
+      setAuthCookies: () => {},
+    },
+  })
+
+  try {
+    const req = {
+      body: {
+        email: user.email,
+      },
+    }
+    const res = {}
+
+    await controller.forgotPassword(req, res)
+
+    assert.deepEqual(successPayload, {
+      data: null,
+      message: 'Jika email terdaftar, tautan reset password akan dikirim ke inbox Anda.',
+    })
+    assert.equal(errorCalled, false)
+  } finally {
+    restore()
+    delete process.env.NODE_ENV
+  }
+})

@@ -11,6 +11,13 @@ const rateLimit = require('express-rate-limit')
 const path = require('path')
 
 const { connectDB } = require('./config/database')
+const {
+  buildAllowedOrigins,
+  isAllowedOrigin,
+  isLoopbackValue,
+  resolveTrustProxySetting,
+} = require('./config/requestSecurity')
+const { enforceTrustedOrigin } = require('./middleware/trustedOrigin')
 const routes = require('./routes')
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler')
 const logger = require('./utils/logger')
@@ -20,36 +27,9 @@ const PORT = process.env.PORT || 5000
 const API = process.env.API_PREFIX || '/api/v1'
 
 app.disable('x-powered-by')
+app.set('trust proxy', resolveTrustProxySetting())
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean)
-
-const isLoopbackOrigin = (origin) => {
-  try {
-    const { hostname, protocol } = new URL(origin)
-    return (
-      process.env.NODE_ENV !== 'production' &&
-      protocol.startsWith('http') &&
-      (hostname === 'localhost' || hostname === '127.0.0.1')
-    )
-  } catch {
-    return false
-  }
-}
-
-const isAllowedOrigin = (origin) => allowedOrigins.includes(origin) || isLoopbackOrigin(origin)
-
-const isLoopbackValue = (value = '') => {
-  const normalized = String(value).trim().toLowerCase()
-  return (
-    normalized === 'localhost' ||
-    normalized === '127.0.0.1' ||
-    normalized === '::1' ||
-    normalized === '::ffff:127.0.0.1'
-  )
-}
+const allowedOrigins = buildAllowedOrigins(process.env.ALLOWED_ORIGINS, process.env.NODE_ENV)
 
 const shouldBypassRateLimit = (req) => {
   if (req.path === '/health') return true
@@ -130,6 +110,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 app.use(cookieParser())
 
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
+app.use(API, enforceTrustedOrigin)
 app.use(API, routes)
 
 app.get('/', (req, res) => {
