@@ -1,4 +1,3 @@
-const apiProxyTarget = process.env.API_PROXY_TARGET?.replace(/\/$/, '')
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',
@@ -80,18 +79,6 @@ const nextConfig = {
             value: 'no-store',
           },
         ],
-      },
-    ]
-  },
-  async rewrites() {
-    if (!apiProxyTarget) {
-      return []
-    }
-
-    return [
-      {
-        source: '/api/v1/:path*',
-        destination: `${apiProxyTarget}/:path*`,
       },
     ]
   },
