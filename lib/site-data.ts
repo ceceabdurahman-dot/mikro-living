@@ -8,6 +8,8 @@ export type Project = {
   summary: string
   description: string
   image: string
+  featured: boolean
+  gallery: string[]
   scope: string[]
 }
 
@@ -26,6 +28,20 @@ export type Service = {
   title: string
   description: string
   detail: string
+}
+
+export type Testimonial = {
+  name: string
+  title: string
+  content: string
+}
+
+export type TeamMember = {
+  id: string
+  name: string
+  role: string
+  bio: string
+  image: string
 }
 
 export const siteMeta = {
@@ -152,6 +168,10 @@ export const projects: Project[] = [
       'This compact apartment was reshaped into a quieter daily environment with full-height cabinetry, softer transitions between living and dining, and a palette that leans earthy without turning flat.',
     image:
       'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=80',
+    featured: true,
+    gallery: [
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=80',
+    ],
     scope: ['Interior design', 'Custom millwork', 'Styling direction'],
   },
   {
@@ -167,6 +187,10 @@ export const projects: Project[] = [
       'The home pairs grounded materials with measured geometry to keep the open plan connected while still giving each zone a clear mood.',
     image:
       'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+    featured: false,
+    gallery: [
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+    ],
     scope: ['Interior architecture', 'Furniture curation', 'Styling'],
   },
   {
@@ -182,6 +206,10 @@ export const projects: Project[] = [
       'This studio layout prioritizes integrated storage and a lighter floor plane so the footprint feels generous without losing function.',
     image:
       'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80',
+    featured: false,
+    gallery: [
+      'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80',
+    ],
     scope: ['Space planning', 'Built-in design', 'Material palette'],
   },
 ]
@@ -237,7 +265,7 @@ export const posts: Post[] = [
   },
 ]
 
-export const testimonial = {
+export const testimonial: Testimonial = {
   name: 'Sarah & Dimas',
   title: 'The Botanica Apartments',
   content:

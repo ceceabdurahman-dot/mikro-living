@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { getProjects } from '@/lib/api'
+import { getProjects, orderProjectsForShowcase } from '@/lib/api'
 import { SiteShell } from '@/components/site/site-shell'
 
 export const metadata: Metadata = {
@@ -12,8 +12,9 @@ export const metadata: Metadata = {
 
 export default async function ProjectsPage() {
   const projects = await getProjects()
-  const featuredProject = projects[0]
-  const secondaryProjects = projects.slice(1)
+  const showcaseProjects = orderProjectsForShowcase(projects)
+  const featuredProject = showcaseProjects[0]
+  const secondaryProjects = showcaseProjects.slice(1)
   const years = projects
     .map((project) => Number(project.year))
     .sort((yearA, yearB) => yearA - yearB)
@@ -106,7 +107,7 @@ export default async function ProjectsPage() {
                   Sequence
                 </p>
                 <div className="mt-6 divide-y divide-outline-variant/20">
-                  {projects.map((project, index) => (
+                  {secondaryProjects.map((project, index) => (
                     <Link
                       key={project.slug}
                       href={`/projects/${project.slug}`}

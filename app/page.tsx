@@ -1,7 +1,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { getPosts, getProjects, getServices } from '@/lib/api'
+import {
+  getFeaturedTestimonial,
+  getPosts,
+  getProjects,
+  getPublicSiteSettings,
+  getServices,
+  getTeamMembers,
+  orderProjectsForShowcase,
+} from '@/lib/api'
 import { SectionHeading } from '@/components/site/section-heading'
 import { SiteShell } from '@/components/site/site-shell'
 import {
@@ -9,7 +17,6 @@ import {
   keywords,
   processSteps,
   studioHighlights,
-  testimonial,
 } from '@/lib/site-data'
 
 const heroImage =
@@ -25,18 +32,27 @@ const lightSecondaryCtaClass =
   'inline-flex w-full items-center justify-center rounded-full border border-outline-variant/40 px-7 py-4 text-sm font-bold uppercase tracking-[0.2em] text-on-surface transition-[background-color,transform,border-color] duration-200 hover:border-outline-variant/70 hover:bg-white motion-safe:hover:-translate-y-1 motion-reduce:transform-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary sm:w-auto'
 
 export default async function HomePage() {
-  const [projects, posts, services] = await Promise.all([
+  const [projects, posts, services, featuredTestimonial, publicSiteSettings, teamMembers] = await Promise.all([
     getProjects(),
     getPosts(),
     getServices(),
+    getFeaturedTestimonial(),
+    getPublicSiteSettings(),
+    getTeamMembers(),
   ])
 
-  const featuredProject = projects[0]
-  const secondaryProject = projects[1] || featuredProject
-  const supportingProjects = projects
+  const showcaseProjects = orderProjectsForShowcase(projects)
+  const featuredProject = showcaseProjects[0]
+  const secondaryProject = showcaseProjects[1] || featuredProject
+  const supportingProjects = showcaseProjects
   const featuredPost = posts[0]
   const supportingPosts = posts.slice(1)
+  const featuredTeamMembers = teamMembers.slice(0, 3)
   const marqueeKeywords = [...keywords, ...keywords]
+  const displayHeroStats = [
+    { ...heroStats[0], value: publicSiteSettings.statProjects || heroStats[0].value },
+    ...heroStats.slice(1),
+  ]
 
   return (
     <SiteShell>
@@ -108,7 +124,7 @@ export default async function HomePage() {
 
           <div className="relative z-10 border-t border-white/10 bg-stone-950/35 backdrop-blur-sm">
             <div className="mx-auto grid max-w-7xl gap-4 px-6 py-5 sm:grid-cols-3 md:px-8">
-              {heroStats.map((item) => (
+              {displayHeroStats.map((item) => (
                 <div key={item.label} className="flex items-end justify-between gap-4 border-b border-white/10 pb-4 sm:block sm:border-b-0 sm:pb-0">
                   <p className="font-headline text-4xl text-primary-fixed-dim">{item.value}</p>
                   <p className="text-right text-[10px] uppercase tracking-[0.3em] text-white/55 sm:mt-2 sm:text-left">
@@ -224,6 +240,54 @@ export default async function HomePage() {
                 </div>
               </div>
             </div>
+
+            {featuredTeamMembers.length > 0 ? (
+              <div className="mt-16 grid gap-6 border-t border-outline-variant/20 pt-10 lg:grid-cols-[0.3fr_0.7fr]">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-primary">
+                    Team
+                  </p>
+                  <p className="mt-4 max-w-sm text-sm leading-7 text-on-surface-variant">
+                    This section now reads from the team endpoint when those records are available,
+                    so the studio story can stay aligned with the people behind the work.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  {featuredTeamMembers.map((member, index) => (
+                    <article
+                      key={member.id}
+                      className={`overflow-hidden rounded-[1.75rem] border border-outline-variant/20 bg-white shadow-lg shadow-stone-900/5 ${
+                        index === 1 ? 'md:-translate-y-4' : ''
+                      }`}
+                    >
+                      <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
+                        <Image
+                          src={member.image}
+                          alt={member.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 22vw"
+                        />
+                      </div>
+                      <div className="space-y-3 p-5">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-primary">
+                          {member.role}
+                        </p>
+                        <h3 className="font-headline text-3xl text-on-surface">{member.name}</h3>
+                        {member.bio ? (
+                          <p className="text-sm leading-7 text-on-surface-variant">{member.bio}</p>
+                        ) : (
+                          <p className="text-sm leading-7 text-on-surface-variant">
+                            Studio profile synced from the team roster.
+                          </p>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         </section>
 
@@ -484,9 +548,9 @@ export default async function HomePage() {
 
                 <div className="grid gap-6">
                   <blockquote className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm leading-7 text-stone-200 sm:p-7">
-                    &quot;{testimonial.content}&quot;
+                    &quot;{featuredTestimonial.content}&quot;
                     <footer className="mt-4 text-[10px] font-bold uppercase tracking-[0.35em] text-stone-500">
-                      {testimonial.name} / {testimonial.title}
+                      {featuredTestimonial.name} / {featuredTestimonial.title}
                     </footer>
                   </blockquote>
 

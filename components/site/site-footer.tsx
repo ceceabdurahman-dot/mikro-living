@@ -1,8 +1,14 @@
 import Link from 'next/link'
 
+import { getPublicSiteSettings } from '@/lib/api'
 import { navigation, siteMeta } from '@/lib/site-data'
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const publicSiteSettings = await getPublicSiteSettings()
+  const contactPhone = publicSiteSettings.contactPhone?.trim()
+  const contactEmail = publicSiteSettings.contactEmail?.trim()
+  const phoneHref = contactPhone ? `tel:${contactPhone.replace(/[^+\d]/g, '')}` : null
+
   return (
     <footer className="border-t border-outline-variant/20 bg-stone-100/95 px-6 py-16 md:px-8 md:py-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-12">
@@ -100,6 +106,22 @@ export function SiteFooter() {
                 >
                   Consultation
                 </Link>
+                {contactPhone && phoneHref ? (
+                  <Link
+                    href={phoneHref}
+                    className="transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                  >
+                    {contactPhone}
+                  </Link>
+                ) : null}
+                {contactEmail ? (
+                  <Link
+                    href={`mailto:${contactEmail}`}
+                    className="transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                  >
+                    {contactEmail}
+                  </Link>
+                ) : null}
               </div>
             </div>
 

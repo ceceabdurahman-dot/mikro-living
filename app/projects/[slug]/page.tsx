@@ -43,6 +43,8 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
   const projectIndex = projects.findIndex((entry) => entry.slug === project.slug)
   const nextProject = projects[(projectIndex + 1) % projects.length]
+  const projectGallery = Array.from(new Set([project.image, ...project.gallery]))
+  const supportingGallery = projectGallery.filter((image) => image !== project.image)
 
   return (
     <SiteShell>
@@ -139,6 +141,27 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                     priority
                   />
                 </div>
+
+                {supportingGallery.length > 0 ? (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {supportingGallery.slice(0, 4).map((image, index) => (
+                      <div
+                        key={`${image}-${index}`}
+                        className={`relative min-h-[220px] overflow-hidden rounded-[1.75rem] ${
+                          index === 0 ? 'sm:col-span-2' : ''
+                        }`}
+                      >
+                        <Image
+                          src={image}
+                          alt={`${project.title} gallery view ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 100vw, 28vw"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
 
                 <div className="grid gap-4 sm:grid-cols-[0.9fr_1.1fr]">
                   <div className="rounded-[1.75rem] bg-stone-950 p-6 text-white">
