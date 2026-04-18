@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 import CmsBrandLogo from '../../components/CmsBrandLogo'
 import { sanitizeInternalRedirect } from '../../lib/safeRedirect'
-import { clearLegacyAuthCookies, loginWithSession } from '../../lib/authSession'
+import { clearLegacyAuthCookies, loginWithSession, markSessionActive } from '../../lib/authSession'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api/v1'
 
@@ -124,6 +124,7 @@ function LoginForm() {
         })
 
         if (!response.ok) throw new Error('Session invalid')
+        markSessionActive()
         router.replace(redirect)
       } catch {
         clearLegacyAuthCookies()
