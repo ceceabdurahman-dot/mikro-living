@@ -44,7 +44,7 @@
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.9.7",
-    "next": "^14.2.30",
+    "next": "^15.5.15",
     "postcss": "^8.4.49",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
