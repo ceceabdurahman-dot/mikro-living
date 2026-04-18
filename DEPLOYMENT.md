@@ -297,6 +297,7 @@ Before opening the SSH session, the workflow also validates that the repository 
 ## Notes
 
 - Frontend uses Next.js `standalone` output for smaller production runtime.
+- A recovery checklist for the `mikroliving.id` -> `api.mikroliving.id` -> backend chain is available in [RECOVERY.md](/D:/Cece%20Abdurahman/Bisnis/Interior/mikro-living/mikro-living/RECOVERY.md).
 - Uploaded local files go to the `api_uploads` Docker volume, but production image handling is expected to use Cloudinary.
 - If you use an external managed MySQL instead of the included `db` service, use [docker-compose.prod.managed-db.yml](E:\xampp\htdocs\mikro-living\docker-compose.prod.managed-db.yml) and point `DB_HOST` to your managed database.
 - The example `DB_NAME=mikro-living.db` is kept from the provided credentials, but many MySQL setups use schema names like `mikro_living`; verify the exact database name with your provider before going live.
