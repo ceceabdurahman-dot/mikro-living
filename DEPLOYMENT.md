@@ -244,6 +244,23 @@ docker compose -f docker-compose.prod.yml -f docker-compose.prod.managed-db.yml 
 docker compose -f docker-compose.prod.yml -f docker-compose.prod.managed-db.yml --env-file .env.production up -d api web
 ```
 
+## 8a. PM2 frontend on VPS or Hostinger Node.js
+
+For a PM2-managed frontend runtime, build the standalone app first:
+
+```bash
+npm run build:web
+```
+
+Then start or restart PM2 with the included ecosystem file:
+
+```bash
+pm2 start ecosystem.config.cjs --env production
+pm2 save
+```
+
+This starts the frontend as `mikroliving-id-web` with `node scripts/start-web.js`, which loads runtime env files and launches `.next/standalone/server.js`.
+
 ## 9. GitHub Actions -> Hostinger VPS
 
 This repo now includes an SSH-based production deploy workflow at [.github/workflows/deploy-hostinger.yml](D:\Cece Abdurahman\Bisnis\Interior\mikro-living\mikro-living\.github\workflows\deploy-hostinger.yml).
@@ -297,6 +314,8 @@ Before opening the SSH session, the workflow also validates that the repository 
 ## Notes
 
 - Frontend uses Next.js `standalone` output for smaller production runtime.
+- For PM2 or Hostinger Node.js hosting, start the frontend with `npm start` or `node scripts/start-web.js`, not `next start`. The bootstrap script loads runtime env files and then launches `.next/standalone/server.js`.
+- A ready-to-run PM2 config for the standalone frontend is available at [ecosystem.config.cjs](/D:/Cece%20Abdurahman/Bisnis/Interior/mikro-living/mikro-living/ecosystem.config.cjs).
 - A recovery checklist for the `mikroliving.id` -> `api.mikroliving.id` -> backend chain is available in [RECOVERY.md](/D:/Cece%20Abdurahman/Bisnis/Interior/mikro-living/mikro-living/RECOVERY.md).
 - Uploaded local files go to the `api_uploads` Docker volume, but production image handling is expected to use Cloudinary.
 - If you use an external managed MySQL instead of the included `db` service, use [docker-compose.prod.managed-db.yml](E:\xampp\htdocs\mikro-living\docker-compose.prod.managed-db.yml) and point `DB_HOST` to your managed database.

@@ -315,6 +315,7 @@ npm run db:seed
 # Install PM2 process manager
 npm install -g pm2
 pm2 start src/index.js --name "mikroliving-api"
+pm2 start ecosystem.config.cjs --env production
 pm2 startup
 pm2 save
 

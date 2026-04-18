@@ -204,7 +204,7 @@ After recovery, consider these cleanups:
 
 - remove or fix unrelated `Example` vhost errors in OpenLiteSpeed
 - keep backups of `httpd_config.conf` and `conf/vhosts/api.mikroliving.id/vhconf.conf`
-- update the PM2 frontend process to use standalone mode instead of `next start`
+- update the PM2 frontend process to use `node scripts/start-web.js` instead of `next start`
 - document any final production env values in your server inventory
 
 For the API subdomain setup details, see [deploy/openlitespeed/api.mikroliving.id.md](/D:/Cece%20Abdurahman/Bisnis/Interior/mikro-living/mikro-living/deploy/openlitespeed/api.mikroliving.id.md).
