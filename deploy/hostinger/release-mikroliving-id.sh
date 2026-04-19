@@ -22,7 +22,7 @@ Options:
   --skip-git-pull                Skip git fetch/pull and release the current checkout as-is
   --allow-dirty                  Allow a dirty git worktree on the VPS
   --allow-npm-install-fallback   Fall back to npm install if npm ci fails
-  --app-dir PATH                 Override the app directory (default: /opt/mikroliving-id)
+  --app-dir PATH                 Override the app directory (default: auto-detect current release or legacy fallback)
   --build-script NAME            Override the npm build script name (default: build)
   -h, --help                     Show this help
 EOF

@@ -9,6 +9,9 @@ WEB_BIND_HOST="${WEB_BIND_HOST:-127.0.0.1}"
 WEB_PORT="${WEB_PORT:-3100}"
 BUILD_SCRIPT="${BUILD_SCRIPT:-build}"
 NODE_ENV_VALUE="${NODE_ENV_VALUE:-production}"
+CURRENT_RELEASE_LINK="${CURRENT_RELEASE_LINK:-/opt/releases/mikroliving-id-current}"
+LEGACY_APP_DIR="${LEGACY_APP_DIR:-/opt/mikroliving-id}"
+ALLOWED_DIRTY_PATHS="${ALLOWED_DIRTY_PATHS:-.env.production next-env.d.ts}"
 
 log() {
   printf '\n==> %s\n' "$*"
@@ -25,12 +28,17 @@ resolve_app_dir() {
     return
   fi
 
-  if [ -f "$PWD/package.json" ] && [ -d "$PWD/.git" ]; then
+  if [ -f "$PWD/package.json" ] && [ -e "$PWD/.git" ]; then
     printf '%s\n' "$PWD"
     return
   fi
 
-  printf '/opt/mikroliving-id\n'
+  if [ -f "$CURRENT_RELEASE_LINK/package.json" ] && [ -e "$CURRENT_RELEASE_LINK/.git" ]; then
+    printf '%s\n' "$CURRENT_RELEASE_LINK"
+    return
+  fi
+
+  printf '%s\n' "$LEGACY_APP_DIR"
 }
 
 need_cmd() {
@@ -56,6 +64,7 @@ systemctl_cmd() {
 print_release_context() {
   log "Runtime context"
   printf 'App dir: %s\n' "$APP_DIR"
+  printf 'Current link: %s\n' "$CURRENT_RELEASE_LINK"
   printf 'API process: %s\n' "$API_PROCESS_NAME"
   printf 'Web process: %s\n' "$WEB_PROCESS_NAME"
   printf 'Build script: npm run %s\n' "$BUILD_SCRIPT"
@@ -75,12 +84,44 @@ assert_attached_branch() {
   printf '%s\n' "$branch"
 }
 
+is_allowed_dirty_path() {
+  local candidate="$1"
+  local allowed
+
+  for allowed in $ALLOWED_DIRTY_PATHS; do
+    if [ "$candidate" = "$allowed" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+filtered_git_status() {
+  local status_output line path filtered=""
+
+  status_output="$(git status --porcelain=v1 --untracked-files=all)"
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    path="${line:3}"
+    if [[ "$path" == *" -> "* ]]; then
+      path="${path##* -> }"
+    fi
+
+    if ! is_allowed_dirty_path "$path"; then
+      filtered+="$line"$'\n'
+    fi
+  done <<< "$status_output"
+
+  printf '%s' "$filtered"
+}
+
 assert_worktree_clean() {
   local allow_dirty="${1:-false}"
   local status_output
 
   git rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "Directory is not a git repository: $APP_DIR"
-  status_output="$(git status --short)"
+  status_output="$(filtered_git_status)"
   if [ -n "$status_output" ] && [ "$allow_dirty" != "true" ]; then
     printf '%s\n' "$status_output" >&2
     fail "Working tree is dirty on the VPS. Stop and inspect before continuing, or rerun with --allow-dirty if you really intend to continue."
@@ -157,6 +198,21 @@ restart_pm2_processes() {
   else
     NODE_ENV="$NODE_ENV_VALUE" pm2 start ./node_modules/next/dist/bin/next --name "$WEB_PROCESS_NAME" -- start -H "$WEB_BIND_HOST" -p "$WEB_PORT"
   fi
+
+  pm2 save
+}
+
+recreate_pm2_processes() {
+  log "Recreating PM2 applications from $APP_DIR"
+
+  pm2 delete "$API_PROCESS_NAME" >/dev/null 2>&1 || true
+  pm2 delete "$WEB_PROCESS_NAME" >/dev/null 2>&1 || true
+
+  (
+    cd "$APP_DIR"
+    NODE_ENV="$NODE_ENV_VALUE" pm2 start scripts/start-api.js --name "$API_PROCESS_NAME" --update-env
+    NODE_ENV="$NODE_ENV_VALUE" pm2 start ./node_modules/next/dist/bin/next --name "$WEB_PROCESS_NAME" -- start -H "$WEB_BIND_HOST" -p "$WEB_PORT"
+  )
 
   pm2 save
 }

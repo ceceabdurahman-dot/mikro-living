@@ -1,6 +1,6 @@
 # Hostinger Release Checklist
 
-Last updated: `2026-04-19`
+Last updated: `2026-04-20`
 
 This is the short, repeatable release flow for the current `mikroliving.id` production stack on Hostinger VPS.
 
@@ -9,25 +9,43 @@ Use `deploy/HOSTINGER_VPS_MIKROLIVING_ID_FINAL.md` for full restore, migration, 
 Use [HOSTINGER_EMERGENCY_ROLLBACK.md](E:\xampp\htdocs\mikro-living\deploy\HOSTINGER_EMERGENCY_ROLLBACK.md) if a live release must be reversed quickly.
 If the VPS is still running from a copied folder and not from git yet, migrate first with [HOSTINGER_GIT_BASED_DEPLOY_MIGRATION.md](E:\xampp\htdocs\mikro-living\deploy\HOSTINGER_GIT_BASED_DEPLOY_MIGRATION.md).
 
+## Current release path
+
+Recommended stable path:
+
+```bash
+/opt/releases/mikroliving-id-current
+```
+
+This should be a symlink pointing to the currently active timestamped release directory.
+
 ## One-command release
 
 Shortcut script:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 bash deploy/hostinger/release-mikroliving-id.sh
 ```
 
 If the release includes migrations:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 bash deploy/hostinger/release-mikroliving-id.sh --with-migrate
+```
+
+For a newly prepared timestamped release, promote it first:
+
+```bash
+cd /opt/releases/mikroliving-id-<TIMESTAMP>
+bash deploy/hostinger/promote-mikroliving-id-release.sh
 ```
 
 ## Current production assumptions
 
-- App directory: `/opt/mikroliving-id`
+- Current app symlink: `/opt/releases/mikroliving-id-current`
+- Legacy fallback app directory: `/opt/mikroliving-id`
 - Canonical URL: `https://www.mikroliving.id`
 - PM2 process names:
   - `mikroliving-id-api`
@@ -42,7 +60,7 @@ bash deploy/hostinger/release-mikroliving-id.sh --with-migrate
 
 ```bash
 tar czf /root/backup-mikroliving-id-config-$(date +%F-%H%M).tgz \
-  /opt/mikroliving-id/.env.production \
+  /opt/releases/mikroliving-id-current/.env.production \
   /root/.pm2/dump.pm2 \
   /usr/local/lsws/conf/vhosts/mikroliving-id/vhconf.conf
 ```
@@ -52,7 +70,7 @@ tar czf /root/backup-mikroliving-id-config-$(date +%F-%H%M).tgz \
 Run this on the VPS:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 git status --short
 git pull --ff-only
 npm ci
@@ -70,7 +88,7 @@ The release script above runs the same flow and also performs live verification.
 Run the migration after dependencies are ready and before PM2 restart:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 NODE_ENV=production node src/config/migrate.js
 ```
 
@@ -110,7 +128,7 @@ Stop and inspect the lockfile mismatch first.
 Only use this fallback if you intentionally accept a dependency refresh on the server:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 npm install
 npm run build
 pm2 restart mikroliving-id-api --update-env
@@ -139,6 +157,7 @@ journalctl -u lsws -n 100 --no-pager
 - Do not run `seed.js` on production without a clear reason.
 - Do not skip verification after restart.
 - Do not leave critical fixes only on the VPS without backporting them to the repo.
+- Do not keep depending on timestamped directories in manual commands once the `current` symlink exists.
 
 ## Recommended follow-up after the auth incident
 

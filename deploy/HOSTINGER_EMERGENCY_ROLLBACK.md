@@ -1,6 +1,6 @@
 # Hostinger Emergency Rollback
 
-Last updated: `2026-04-19`
+Last updated: `2026-04-20`
 
 This runbook is for fast rollback on the current `mikroliving.id` Hostinger VPS when a release is already live and verification fails.
 
@@ -12,7 +12,7 @@ For routine deploys, use [HOSTINGER_RELEASE_CHECKLIST.md](E:\xampp\htdocs\mikro-
 Shortcut script:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 bash deploy/hostinger/rollback-mikroliving-id.sh --good-commit <GOOD_COMMIT>
 ```
 
@@ -24,7 +24,7 @@ Restore the last known good application release quickly and safely.
 
 This runbook assumes:
 
-- app path is `/opt/mikroliving-id`
+- app path is `/opt/releases/mikroliving-id-current`
 - PM2 process names are:
   - `mikroliving-id-api`
   - `mikroliving-id-web`
@@ -43,7 +43,7 @@ Before rollback, check these first:
 Run this first:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 git status --short
 git log --oneline -5
 pm2 status
@@ -60,7 +60,7 @@ If the release itself is bad, continue with rollback.
 Capture the current commit before changing anything:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 git rev-parse HEAD
 git rev-parse --short HEAD
 ```
@@ -72,7 +72,7 @@ Save that SHA in your incident note so we know exactly what was rolled back.
 Replace `<GOOD_COMMIT>` with the previously verified good SHA.
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 git fetch --all --tags
 git checkout <GOOD_COMMIT>
 npm ci
@@ -131,7 +131,7 @@ At minimum, confirm these before closing the incident:
 Use this fallback only if you accept dependency refresh on the server:
 
 ```bash
-cd /opt/mikroliving-id
+cd /opt/releases/mikroliving-id-current
 npm install
 npm run build
 pm2 restart mikroliving-id-api --update-env

@@ -22,6 +22,7 @@ The safest migration is:
 4. copy `.env.production` into the new clone
 5. build and verify there
 6. cut PM2 over to the cloned repo
+7. point a stable `current` symlink to the active release
 
 This avoids damaging the currently healthy live folder.
 
@@ -85,6 +86,28 @@ systemctl restart lsws
 
 At this point PM2 will be running from the cloned git-based release directory.
 
+## Phase 3.5: Create the stable `current` symlink
+
+Recommended symlink:
+
+```bash
+ln -sfn /opt/releases/mikroliving-id-<TIMESTAMP> /opt/releases/mikroliving-id-current
+```
+
+Or use the helper script from the new release directory:
+
+```bash
+cd /opt/releases/mikroliving-id-<TIMESTAMP>
+bash deploy/hostinger/promote-mikroliving-id-release.sh
+```
+
+This will:
+
+- update `/opt/releases/mikroliving-id-current`
+- recreate PM2 processes from the symlink path
+- restart LiteSpeed
+- run live verification
+
 ## Phase 4: Verify after cutover
 
 ```bash
@@ -103,10 +126,10 @@ Expected:
 
 ## Phase 5: Use git-based releases going forward
 
-After PM2 is already running from the cloned repo, future releases are much simpler:
+After PM2 is already running from the `current` symlink, future releases are much simpler:
 
 ```bash
-cd /opt/releases/mikroliving-id-<ACTIVE_RELEASE_DIR>
+cd /opt/releases/mikroliving-id-current
 git pull --ff-only
 npm ci
 npm run build
@@ -117,9 +140,12 @@ pm2 save
 systemctl restart lsws
 ```
 
-## Important caveat
+For a brand-new timestamped release, prepare it in its own directory first, then promote it:
 
-If you create a new timestamped clone for every release, `git pull` must be run in the currently active release directory, not in `/opt/mikroliving-id`, unless you later convert production to a stable symlink-based release layout.
+```bash
+cd /opt/releases/mikroliving-id-<NEW_TIMESTAMP>
+bash deploy/hostinger/promote-mikroliving-id-release.sh
+```
 
 ## Optional cleanup after a stable cutover
 
