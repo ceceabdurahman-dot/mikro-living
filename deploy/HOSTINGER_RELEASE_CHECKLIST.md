@@ -6,6 +6,23 @@ This is the short, repeatable release flow for the current `mikroliving.id` prod
 
 Use this checklist for normal releases.
 Use `deploy/HOSTINGER_VPS_MIKROLIVING_ID_FINAL.md` for full restore, migration, or server rebuild work.
+Use [HOSTINGER_EMERGENCY_ROLLBACK.md](E:\xampp\htdocs\mikro-living\deploy\HOSTINGER_EMERGENCY_ROLLBACK.md) if a live release must be reversed quickly.
+
+## One-command release
+
+Shortcut script:
+
+```bash
+cd /opt/mikroliving-id
+bash deploy/hostinger/release-mikroliving-id.sh
+```
+
+If the release includes migrations:
+
+```bash
+cd /opt/mikroliving-id
+bash deploy/hostinger/release-mikroliving-id.sh --with-migrate
+```
 
 ## Current production assumptions
 
@@ -44,6 +61,8 @@ pm2 restart mikroliving-id-web --update-env
 pm2 save
 systemctl restart lsws
 ```
+
+The release script above runs the same flow and also performs live verification.
 
 ## If the release includes DB changes
 
@@ -111,6 +130,7 @@ journalctl -u lsws -n 100 --no-pager
 ```
 
 3. If needed, roll back to the last known good commit, then rebuild and restart.
+   Use [HOSTINGER_EMERGENCY_ROLLBACK.md](E:\xampp\htdocs\mikro-living\deploy\HOSTINGER_EMERGENCY_ROLLBACK.md).
 
 ## Never do this
 
