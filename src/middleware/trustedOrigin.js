@@ -4,6 +4,7 @@ const {
   isAllowedOrigin,
   resolveRequestOrigin,
   shouldAllowMissingOrigin,
+  shouldAllowMissingOriginViaFetchMetadata,
   shouldRequireTrustedOrigin,
 } = require('../config/requestSecurity')
 
@@ -21,6 +22,10 @@ const validateTrustedOriginRequest = (
   const requestOrigin = resolveRequestOrigin(req)
   if (!requestOrigin) {
     if (shouldAllowMissingOrigin(req, nodeEnv)) {
+      return { ok: true }
+    }
+
+    if (shouldAllowMissingOriginViaFetchMetadata(req, allowedOrigins, nodeEnv)) {
       return { ok: true }
     }
 

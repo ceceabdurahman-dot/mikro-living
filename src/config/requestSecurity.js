@@ -31,6 +31,8 @@ const isAllowedOrigin = (
 
 const hasBearerAuthorization = (req) => /^Bearer\s+/i.test(String(req.headers?.authorization || '').trim())
 
+const normalizeForwardedHeaderValue = (value = '') => String(value).split(',')[0].trim()
+
 const resolveRequestOrigin = (req) => {
   const explicitOrigin = String(req.headers?.origin || '').trim()
   if (explicitOrigin) return explicitOrigin
@@ -41,6 +43,22 @@ const resolveRequestOrigin = (req) => {
   try {
     const parsed = new URL(referer)
     return `${parsed.protocol}//${parsed.host}`
+  } catch {
+    return ''
+  }
+}
+
+const resolveTargetOrigin = (req) => {
+  const forwardedProto = normalizeForwardedHeaderValue(req.headers?.['x-forwarded-proto'])
+  const forwardedHost = normalizeForwardedHeaderValue(req.headers?.['x-forwarded-host'])
+  const hostHeader = normalizeForwardedHeaderValue(req.headers?.host)
+  const protocol = forwardedProto || String(req.protocol || '').trim()
+  const host = forwardedHost || hostHeader
+
+  if (!protocol || !host) return ''
+
+  try {
+    return new URL(`${protocol}://${host}`).origin
   } catch {
     return ''
   }
@@ -59,6 +77,27 @@ const shouldAllowMissingOrigin = (req, nodeEnv = process.env.NODE_ENV) => {
     hostHeader.includes('127.0.0.1') ||
     hostHeader.includes('localhost')
   )
+}
+
+const shouldAllowMissingOriginViaFetchMetadata = (
+  req,
+  allowedOrigins = buildAllowedOrigins(process.env.ALLOWED_ORIGINS, process.env.NODE_ENV),
+  nodeEnv = process.env.NODE_ENV
+) => {
+  if (nodeEnv !== 'production') return false
+
+  const fetchSite = String(req.headers?.['sec-fetch-site'] || '')
+    .trim()
+    .toLowerCase()
+
+  if (!['same-origin', 'same-site', 'none'].includes(fetchSite)) {
+    return false
+  }
+
+  const targetOrigin = resolveTargetOrigin(req)
+  if (!targetOrigin) return false
+
+  return isAllowedOrigin(targetOrigin, allowedOrigins, nodeEnv)
 }
 
 const resolveTrustProxySetting = ({
@@ -100,7 +139,9 @@ module.exports = {
   isAllowedOrigin,
   isLoopbackValue,
   resolveRequestOrigin,
+  resolveTargetOrigin,
   resolveTrustProxySetting,
   shouldAllowMissingOrigin,
+  shouldAllowMissingOriginViaFetchMetadata,
   shouldRequireTrustedOrigin,
 }
