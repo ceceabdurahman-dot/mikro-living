@@ -7,6 +7,7 @@ This is the short, repeatable release flow for the current `mikroliving.id` prod
 Use this checklist for normal releases.
 Use `deploy/HOSTINGER_VPS_MIKROLIVING_ID_FINAL.md` for full restore, migration, or server rebuild work.
 Use [HOSTINGER_EMERGENCY_ROLLBACK.md](E:\xampp\htdocs\mikro-living\deploy\HOSTINGER_EMERGENCY_ROLLBACK.md) if a live release must be reversed quickly.
+If the VPS is still running from a copied folder and not from git yet, migrate first with [HOSTINGER_GIT_BASED_DEPLOY_MIGRATION.md](E:\xampp\htdocs\mikro-living\deploy\HOSTINGER_GIT_BASED_DEPLOY_MIGRATION.md).
 
 ## One-command release
 
