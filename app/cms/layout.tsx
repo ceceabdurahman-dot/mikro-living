@@ -4,6 +4,9 @@ import { redirect } from 'next/navigation'
 
 import { SESSION_TOKEN } from '../../lib/authSession'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function CmsLayout({
   children,
 }: {

@@ -4,6 +4,8 @@ Last updated: `2026-04-11`
 
 This is the final restore / migration runbook for the `mikroliving.id` production stack on the Hostinger VPS at `151.106.124.161`.
 
+For routine day-to-day releases, use [deploy/HOSTINGER_RELEASE_CHECKLIST.md](E:\xampp\htdocs\mikro-living\deploy\HOSTINGER_RELEASE_CHECKLIST.md).
+
 ## Production architecture
 
 - DNS:
