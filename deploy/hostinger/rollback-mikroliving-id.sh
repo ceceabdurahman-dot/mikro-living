@@ -70,6 +70,7 @@ done
 
 [ -n "$GOOD_COMMIT" ] || fail "--good-commit is required"
 
+APP_DIR="$(resolve_app_dir)"
 ensure_required_commands
 
 [ -d "$APP_DIR" ] || fail "App directory not found: $APP_DIR"

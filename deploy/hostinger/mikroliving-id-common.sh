@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-APP_DIR="${APP_DIR:-/opt/mikroliving-id}"
 API_PROCESS_NAME="${API_PROCESS_NAME:-mikroliving-id-api}"
 WEB_PROCESS_NAME="${WEB_PROCESS_NAME:-mikroliving-id-web}"
 APEX_HOST="${APEX_HOST:-mikroliving.id}"
@@ -18,6 +17,20 @@ log() {
 fail() {
   printf 'ERROR: %s\n' "$*" >&2
   exit 1
+}
+
+resolve_app_dir() {
+  if [ -n "${APP_DIR:-}" ]; then
+    printf '%s\n' "$APP_DIR"
+    return
+  fi
+
+  if [ -f "$PWD/package.json" ] && [ -d "$PWD/.git" ]; then
+    printf '%s\n' "$PWD"
+    return
+  fi
+
+  printf '/opt/mikroliving-id\n'
 }
 
 need_cmd() {
@@ -55,6 +68,7 @@ current_branch() {
 }
 
 assert_attached_branch() {
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "Directory is not a git repository: $APP_DIR"
   local branch
   branch="$(current_branch)"
   [ -n "$branch" ] || fail "Git is in detached HEAD. Reattach to the intended tracking branch before running a normal release."
@@ -65,6 +79,7 @@ assert_worktree_clean() {
   local allow_dirty="${1:-false}"
   local status_output
 
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "Directory is not a git repository: $APP_DIR"
   status_output="$(git status --short)"
   if [ -n "$status_output" ] && [ "$allow_dirty" != "true" ]; then
     printf '%s\n' "$status_output" >&2
