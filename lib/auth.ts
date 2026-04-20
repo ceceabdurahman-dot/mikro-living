@@ -120,10 +120,13 @@ async function fetchAuthJson(path: string, init?: RequestInit) {
   const timeoutId = setTimeout(() => controller.abort(), AUTH_REQUEST_TIMEOUT_MS)
 
   try {
+    const siteOrigin = (process.env.NEXT_PUBLIC_SITE_URL || siteMeta.url).replace(/\/$/, '')
+
     const response = await fetch(`${baseUrl}${path}`, {
       ...init,
       headers: {
         Accept: 'application/json',
+        Origin: siteOrigin,
         ...(init?.headers ?? {}),
       },
       cache: 'no-store',
