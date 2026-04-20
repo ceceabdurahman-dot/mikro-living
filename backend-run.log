@@ -1,5 +1,23 @@
-11:11:12 [[34mdebug[39m]: Executing (default): SELECT 1+1 AS result
-11:11:12 [[32minfo[39m]: ✅ MySQL Database connected successfully
-11:11:12 [[32minfo[39m]: 🚀 Server running on http://localhost:5000
-11:11:12 [[32minfo[39m]: 📡 API base: http://localhost:5000/api/v1
-11:11:12 [[32minfo[39m]: 🌍 Environment: development
+15:59:54 [[34mdebug[39m]: Executing (default): SELECT 1+1 AS result
+15:59:54 [[32minfo[39m]: MySQL database connected successfully
+15:59:54 [[32minfo[39m]: Server running on http://localhost:5000
+15:59:54 [[32minfo[39m]: API base: http://localhost:5000/api/v1
+15:59:54 [[32minfo[39m]: Environment: development
+15:59:54 [[32mhttp[39m]: [0mGET /api/v1/health [32m200[0m 7.520 ms - 108[0m
+16:00:24 [[34mdebug[39m]: Executing (default): SELECT `id`, `name`, `email`, `password`, `role`, `avatar_url`, `avatar_id`, `is_active`, `last_login`, `refresh_token`, `created_at` AS `createdAt`, `updated_at` AS `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'admin@mikroliving.com';
+16:00:24 [[34mdebug[39m]: Executing (default): UPDATE `users` SET `refresh_token`=?,`last_login`=?,`updated_at`=? WHERE `id` = ?
+16:00:24 [[32minfo[39m]: User login: admin@mikroliving.com
+16:00:24 [[32mhttp[39m]: [0mPOST /api/v1/auth/login [32m200[0m 966.387 ms - 486[0m
+16:04:38 [[34mdebug[39m]: Executing (default): SELECT `id`, `name`, `email`, `password`, `role`, `avatar_url`, `avatar_id`, `is_active`, `last_login`, `refresh_token`, `created_at` AS `createdAt`, `updated_at` AS `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'admin@mikroliving.com';
+16:04:39 [[34mdebug[39m]: Executing (default): UPDATE `users` SET `refresh_token`=?,`last_login`=?,`updated_at`=? WHERE `id` = ?
+16:04:39 [[32minfo[39m]: User login: admin@mikroliving.com
+16:04:39 [[32mhttp[39m]: [0mPOST /api/v1/auth/login [32m200[0m 584.072 ms - 486[0m
+16:04:39 [[34mdebug[39m]: Executing (default): SELECT `id`, `name`, `email`, `password`, `role`, `avatar_url`, `avatar_id`, `is_active`, `last_login`, `refresh_token`, `created_at` AS `createdAt`, `updated_at` AS `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'admin@mikroliving.com';
+16:04:40 [[34mdebug[39m]: Executing (default): UPDATE `users` SET `refresh_token`=?,`last_login`=?,`updated_at`=? WHERE `id` = ?
+16:04:40 [[32minfo[39m]: User login: admin@mikroliving.com
+16:04:40 [[32mhttp[39m]: [0mPOST /api/v1/auth/login [32m200[0m 651.585 ms - 486[0m
+16:06:03 [[32mhttp[39m]: [0mGET /api/v1/health [32m200[0m 1.308 ms - 110[0m
+16:06:03 [[34mdebug[39m]: Executing (default): SELECT `id`, `name`, `email`, `password`, `role`, `avatar_url`, `avatar_id`, `is_active`, `last_login`, `refresh_token`, `created_at` AS `createdAt`, `updated_at` AS `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'admin@mikroliving.com';
+16:06:03 [[34mdebug[39m]: Executing (default): UPDATE `users` SET `refresh_token`=?,`last_login`=?,`updated_at`=? WHERE `id` = ?
+16:06:03 [[32minfo[39m]: User login: admin@mikroliving.com
+16:06:03 [[32mhttp[39m]: [0mPOST /api/v1/auth/login [32m200[0m 600.232 ms - 486[0m
