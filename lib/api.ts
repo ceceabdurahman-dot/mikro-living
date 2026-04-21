@@ -797,9 +797,10 @@ export async function createConsultationRequest(input: ConsultationRequestInput)
         body: JSON.stringify({
           name: input.name,
           email: input.email,
-          project_type: input.projectType,
-          timeline: input.timeline,
-          message: input.brief,
+          service_type: input.projectType,
+          message: input.timeline
+            ? `${input.brief || ''}\n\nTimeline: ${input.timeline}`.trim()
+            : input.brief,
         }),
       })
     } finally {
